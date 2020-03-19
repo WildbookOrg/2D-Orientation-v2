@@ -1,0 +1,49 @@
+#!/bin/bash
+#SBATCH --time=240
+#SBATCH --ntasks=32
+#SBATCH --partition=dcs
+#SBATCH --gres=gpu:1
+
+srun \    
+    --job-name=seadragon \        
+    python3 train.py \
+    --type regression \
+    --nClasses 2 \
+    --device 0 \
+    --separate-trig \
+    --batchSz 60 \
+    --animal seadragon &
+
+srun \    
+    --job-name=seaturtle \        
+    python3 train.py \
+    --type regression \
+    --nClasses 2 \
+    --device 0 \
+    --separate-trig \
+    --batchSz 60 \
+    --animal seaturtle &
+
+srun \    
+    --job-name=mantaray \        
+    python3 train.py \
+    --type regression \
+    --nClasses 2 \
+    --device 0 \
+    --separate-trig \
+    --batchSz 60 \
+    --animal seadragon &
+
+srun \    
+    --job-name=rightwhale \        
+    python3 train.py \
+    --type regression \
+    --nClasses 2 \
+    --device 0 \
+    --separate-trig \
+    --batchSz 60 \
+    --animal rightwhale &
+
+wait
+
+

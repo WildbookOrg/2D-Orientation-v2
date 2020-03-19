@@ -1,0 +1,631 @@
+{
+    "info": {
+        "description": "Wild Me MM_Master Dataset",
+        "url": "http://www.wildme.org",
+        "version": "1.0",
+        "year": 2020,
+        "contributor": "Wild Me, Jason Parham <parham@wildme.org>",
+        "date_created": "2020-01-30 20:19:55.429694",
+        "name": "MM_Master",
+        "uuid": "2c77216c-dbc5-4a44-845d-ebc79928a386"
+    },
+    "licenses": [
+        {
+            "url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+            "id": 3,
+            "name": "Attribution-NonCommercial-NoDerivs License"
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "manta_ray_giant",
+            "supercategory": "animal"
+        }
+    ],
+    "images": [
+        {
+            "license": 3,
+            "file_name": "000000000001.jpg",
+            "coco_url": null,
+            "height": 1800,
+            "width": 2400,
+            "date_captured": "2013-10-10 14:54:04",
+            "flickr_url": null,
+            "id": 1,
+            "uuid": "734acee5-36d8-484c-9980-41e0bbcac071"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000002.jpg",
+            "coco_url": null,
+            "height": 2400,
+            "width": 1799,
+            "date_captured": "2016-07-27 09:15:26",
+            "flickr_url": null,
+            "id": 2,
+            "uuid": "eb45e6c1-c8d3-4d56-98de-a1767a67e28b"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000004.jpg",
+            "coco_url": null,
+            "height": 2400,
+            "width": 1333,
+            "date_captured": "2014-07-09 11:25:30",
+            "flickr_url": null,
+            "id": 4,
+            "uuid": "5ae0bf2c-c275-49f1-8d11-0cb96b2e3c04"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000006.jpg",
+            "coco_url": null,
+            "height": 1896,
+            "width": 2400,
+            "date_captured": "2014-07-23 12:38:10",
+            "flickr_url": null,
+            "id": 6,
+            "uuid": "2025b9f6-a63d-402c-b765-55667eb61b2e"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000008.jpg",
+            "coco_url": null,
+            "height": 2296,
+            "width": 2400,
+            "date_captured": "2012-07-20 16:24:30",
+            "flickr_url": null,
+            "id": 8,
+            "uuid": "77672ef7-f18c-406a-8496-0a56799ba01d"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000010.jpg",
+            "coco_url": null,
+            "height": 1826,
+            "width": 2400,
+            "date_captured": "2017-12-11 10:03:34",
+            "flickr_url": null,
+            "id": 10,
+            "uuid": "9d303de8-8aaf-44f7-994a-e80685c0a9f3"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000011.jpg",
+            "coco_url": null,
+            "height": 1325,
+            "width": 2400,
+            "date_captured": "1970-01-01 00:00:00",
+            "flickr_url": null,
+            "id": 11,
+            "uuid": "48cd968c-4542-42db-83a5-506067659c91"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000012.jpg",
+            "coco_url": null,
+            "height": 1349,
+            "width": 2400,
+            "date_captured": "2018-01-18 17:24:38",
+            "flickr_url": null,
+            "id": 12,
+            "uuid": "54a5c0fd-5678-47d7-96a0-d170576c5d01"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000013.jpg",
+            "coco_url": null,
+            "height": 1347,
+            "width": 2400,
+            "date_captured": "2018-01-18 17:22:10",
+            "flickr_url": null,
+            "id": 13,
+            "uuid": "381d7fca-ddf2-49ed-afdf-cf6b882b09e0"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000014.jpg",
+            "coco_url": null,
+            "height": 2400,
+            "width": 1768,
+            "date_captured": "2014-09-09 10:52:48",
+            "flickr_url": null,
+            "id": 14,
+            "uuid": "d34976e4-dc6f-49dd-94fc-8c3eb993d12a"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000017.jpg",
+            "coco_url": null,
+            "height": 1887,
+            "width": 2400,
+            "date_captured": "2018-05-05 15:08:38",
+            "flickr_url": null,
+            "id": 17,
+            "uuid": "66cbca8d-3dec-400c-9c0b-5e74f80616a4"
+        },
+        {
+            "license": 3,
+            "file_name": "000000000019.jpg",
+            "coco_url": null,
+            "height": 1800,
+            "width": 2400,
+            "date_captured": "2018-05-05 09:10:43",
+            "flickr_url": null,
+            "id": 19,
+            "uuid": "f43bb6ee-c729-428b-9508-09ece94512f8"
+        }
+    ],
+    "annotations": [
+        {
+            "bbox": [
+                0.0,
+                0.0,
+                2397.443181818182,
+                1596.3068181818182
+            ],
+            "theta": 0.0,
+            "viewpoint": "downback",
+            "segmentation": [
+                [
+                    0,
+                    0,
+                    2397,
+                    0,
+                    2397,
+                    1596,
+                    0,
+                    1596,
+                    0,
+                    0
+                ]
+            ],
+            "segmentation_bbox": [
+                0,
+                0,
+                2397,
+                1596
+            ],
+            "area": 3825612,
+            "iscrowd": 0,
+            "id": 1,
+            "image_id": 1,
+            "category_id": 0,
+            "uuid": "a1347826-05fd-483b-9b16-bafb04bb0ac0",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                7.254740313272877,
+                6.595218466611707,
+                959.6042868920033,
+                2082.7699917559767
+            ],
+            "theta": 0.0,
+            "viewpoint": "right",
+            "segmentation": [
+                [
+                    7,
+                    7,
+                    967,
+                    7,
+                    967,
+                    2089,
+                    7,
+                    2089,
+                    7,
+                    7
+                ]
+            ],
+            "segmentation_bbox": [
+                7,
+                7,
+                960,
+                2082
+            ],
+            "area": 1998720,
+            "iscrowd": 0,
+            "id": 2,
+            "image_id": 2,
+            "category_id": 0,
+            "uuid": "645a072d-b171-446c-840d-b6193dbe64a7",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                247.31182795698922,
+                772.0430107526881,
+                1309.6774193548385,
+                1167.741935483871
+            ],
+            "theta": 0.4048632661566218,
+            "viewpoint": "downleft",
+            "segmentation": [
+                [
+                    531,
+                    561,
+                    1733,
+                    1077,
+                    1273,
+                    2151,
+                    71,
+                    1634,
+                    531,
+                    561
+                ]
+            ],
+            "segmentation_bbox": [
+                71,
+                561,
+                1261,
+                1590
+            ],
+            "area": 2004990,
+            "iscrowd": 0,
+            "id": 4,
+            "image_id": 4,
+            "category_id": 0,
+            "uuid": "f7000544-b85a-4a06-912b-c33989628343",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                222.65625,
+                44.53125,
+                2121.09375,
+                1633.59375
+            ],
+            "theta": 0.2503180486004659,
+            "viewpoint": "downback",
+            "segmentation": [
+                [
+                    457,
+                    -192,
+                    2512,
+                    333,
+                    2109,
+                    1915,
+                    54,
+                    1390,
+                    457,
+                    -192
+                ]
+            ],
+            "segmentation_bbox": [
+                54,
+                0,
+                2345,
+                1895
+            ],
+            "area": 4443775,
+            "iscrowd": 0,
+            "id": 7,
+            "image_id": 6,
+            "category_id": 0,
+            "uuid": "d75468a4-c3ee-4003-8c09-e938c6f50f17",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                -3.5714285714285716,
+                296.42857142857144,
+                2350.0,
+                1639.2857142857144
+            ],
+            "theta": -0.14217883137897225,
+            "viewpoint": "downleft",
+            "segmentation": [
+                [
+                    -107,
+                    471,
+                    2218,
+                    139,
+                    2450,
+                    1761,
+                    125,
+                    2093,
+                    -107,
+                    471
+                ]
+            ],
+            "segmentation_bbox": [
+                0,
+                139,
+                2399,
+                1954
+            ],
+            "area": 4687646,
+            "iscrowd": 0,
+            "id": 9,
+            "image_id": 8,
+            "category_id": 0,
+            "uuid": "14769767-869d-41f7-8640-04f21c0989a8",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                -72.61724659606656,
+                29.046898638426626,
+                1267.1709531013616,
+                1209.0771558245083
+            ],
+            "theta": -1.8134538642837352,
+            "viewpoint": "downleft",
+            "segmentation": [
+                [
+                    127,
+                    1394,
+                    -178,
+                    163,
+                    995,
+                    -127,
+                    1300,
+                    1104,
+                    127,
+                    1394
+                ]
+            ],
+            "segmentation_bbox": [
+                0,
+                0,
+                1300,
+                1394
+            ],
+            "area": 1812200,
+            "iscrowd": 0,
+            "id": 11,
+            "image_id": 10,
+            "category_id": 0,
+            "uuid": "a1b0656f-58bf-4d19-836a-b3b01411f395",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                577.8491171749599,
+                146.3884430176565,
+                1494.7030497592295,
+                1070.9470304975923
+            ],
+            "theta": 0.0,
+            "viewpoint": "down",
+            "segmentation": [
+                [
+                    578,
+                    146,
+                    2073,
+                    146,
+                    2073,
+                    1217,
+                    578,
+                    1217,
+                    578,
+                    146
+                ]
+            ],
+            "segmentation_bbox": [
+                578,
+                146,
+                1495,
+                1071
+            ],
+            "area": 1601145,
+            "iscrowd": 0,
+            "id": 12,
+            "image_id": 11,
+            "category_id": 0,
+            "uuid": "30557fe5-8c7e-42f9-b342-9014f4414b4c",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                -20.769230769230766,
+                175.38461538461536,
+                2418.461538461538,
+                948.4615384615383
+            ],
+            "theta": 3.141592653589793,
+            "viewpoint": "downback",
+            "segmentation": [
+                [
+                    2398,
+                    1124,
+                    -21,
+                    1124,
+                    -21,
+                    175,
+                    2398,
+                    175,
+                    2398,
+                    1124
+                ]
+            ],
+            "segmentation_bbox": [
+                0,
+                175,
+                2398,
+                949
+            ],
+            "area": 2275702,
+            "iscrowd": 0,
+            "id": 13,
+            "image_id": 13,
+            "category_id": 0,
+            "uuid": "3c5952b7-7712-44c0-a418-f611c1c94c38",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                -83.203125,
+                185.15625,
+                1692.1875,
+                1402.734375
+            ],
+            "theta": -1.5707963267948966,
+            "viewpoint": "downleft",
+            "segmentation": [
+                [
+                    61,
+                    1732,
+                    62,
+                    40,
+                    1465,
+                    40,
+                    1465,
+                    1732,
+                    61,
+                    1732
+                ]
+            ],
+            "segmentation_bbox": [
+                61,
+                40,
+                1404,
+                1692
+            ],
+            "area": 2375568,
+            "iscrowd": 0,
+            "id": 14,
+            "image_id": 14,
+            "category_id": 0,
+            "uuid": "aba560c5-3b36-43c0-aac7-a832a9c39295",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                -61.91950464396285,
+                -104.02476780185759,
+                2427.244582043344,
+                1790.7120743034056
+            ],
+            "theta": 0.23422631285343876,
+            "viewpoint": "down",
+            "segmentation": [
+                [
+                    178,
+                    -362,
+                    2541,
+                    203,
+                    2125,
+                    1944,
+                    -238,
+                    1380,
+                    178,
+                    -362
+                ]
+            ],
+            "segmentation_bbox": [
+                0,
+                0,
+                2399,
+                1886
+            ],
+            "area": 4524514,
+            "iscrowd": 0,
+            "id": 17,
+            "image_id": 17,
+            "category_id": 0,
+            "uuid": "a2ce2e5b-edf0-4b98-9f9b-435e86823484",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                12.1875,
+                98.4375,
+                2371.875,
+                1287.1875
+            ],
+            "theta": 0.0,
+            "viewpoint": "downback",
+            "segmentation": [
+                [
+                    12,
+                    98,
+                    2384,
+                    98,
+                    2384,
+                    1386,
+                    12,
+                    1386,
+                    12,
+                    98
+                ]
+            ],
+            "segmentation_bbox": [
+                12,
+                98,
+                2372,
+                1288
+            ],
+            "area": 3055136,
+            "iscrowd": 0,
+            "id": 19,
+            "image_id": 19,
+            "category_id": 0,
+            "uuid": "c2d0391b-02a1-4066-8a64-a539f9b8d841",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        },
+        {
+            "bbox": [
+                0.0,
+                4.701273261508325,
+                1471.4985308521057,
+                2287.1694417238
+            ],
+            "theta": 0.0,
+            "viewpoint": "down",
+            "segmentation": [
+                [
+                    0,
+                    5,
+                    1471,
+                    5,
+                    1471,
+                    2292,
+                    0,
+                    2292,
+                    0,
+                    5
+                ]
+            ],
+            "segmentation_bbox": [
+                0,
+                5,
+                1471,
+                2287
+            ],
+            "area": 3364177,
+            "iscrowd": 0,
+            "id": 20,
+            "image_id": 20,
+            "category_id": 0,
+            "uuid": "5ed03d1d-b461-4c24-bd72-a64e3af803ba",
+            "isinterest": 1,
+            "name": "____",
+            "review_ids": []
+        }
+    ],
+    "parts": []
+}
