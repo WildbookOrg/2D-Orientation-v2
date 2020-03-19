@@ -219,7 +219,6 @@ def plot_loss_history(args):
 
 	# partial epoch, loss, error
 
-
 	train_partial_epoch = []
 	train_partial_loss = []
 	train_epoch = []
@@ -232,8 +231,8 @@ def plot_loss_history(args):
 
 	train_file = datafiles['train']
 	for line in train_file:
-		line = line.split(',')
-		print(line)
+		line = [float(x) for x in line.strip().split(',')]
+		# print(line)
 		if(len(line)==3):
 			partialEpoch, loss, error = line
 			train_partial_epoch.append(partialEpoch)
@@ -246,8 +245,8 @@ def plot_loss_history(args):
 
 	val_file = datafiles['val']
 	for line in val_file:
-		line = line.split(',')
-		print(line)
+		line = [float(x) for x in line.strip().split(',')]
+		# print(line)
 		if(len(line)==3):
 			partialEpoch, loss, error = line
 			val_partial_epoch.append(partialEpoch)
@@ -258,17 +257,74 @@ def plot_loss_history(args):
 			val_epoch.append(epoch)
 			val_loss.append(loss)
 
-	# plt.plot(train_partial_epoch, train_partial_loss,label='train partial')
-	# print(train_partial_epoch)
-	# print(train_partial_loss)
+	train_partial_epoch_split = []
+	train_partial_loss_split = []
+	prev_index = 0
+	for i in range(1,len(train_partial_epoch)):
+		if(train_partial_epoch[i]<train_partial_epoch[i-1]):
+			train_partial_epoch_split.append(train_partial_epoch[prev_index:i])
+			train_partial_loss_split.append(train_partial_loss[prev_index:i])
+			prev_index = i
 
-	plt.plot(train_epoch, train_loss,label='train')
-	print(train_epoch)
-	print(train_loss)
+	val_partial_epoch_split = []
+	val_partial_loss_split = []
+	prev_index = 0
+	for i in range(1,len(val_partial_epoch)):
+		if(val_partial_epoch[i]<val_partial_epoch[i-1]):
+			val_partial_epoch_split.append(val_partial_epoch[prev_index:i])
+			val_partial_loss_split.append(val_partial_loss[prev_index:i])
+			prev_index = i
 
-	# plt.plot(val_partial_epoch, val_partial_loss,label='val partial')
+	for i in range(len(train_partial_epoch_split)):
+		plt.plot(train_partial_epoch_split[i], train_partial_loss_split[i],label='train partial',color='b')
+	for i in range(len(val_partial_epoch_split)):
+		plt.plot(val_partial_epoch_split[i], val_partial_loss_split[i],label='val partial',color='r')
+	
+	plt.title('History of Each Batch')
+	plt.xlabel('Partial Epoch')
+	plt.ylabel('Loss')
+	plt.legend()
+	plt.show()
 
-	# plt.plot(val_epoch, val_loss,label='val')
+	train_epoch_split = []
+	train_loss_split = []
+	prev_index = 0
+	for i in range(1,len(train_epoch)):
+		if(train_epoch[i]<train_epoch[i-1]):
+			train_epoch_split.append(train_epoch[prev_index:i])
+			train_loss_split.append(train_loss[prev_index:i])
+			prev_index = i
+
+	val_epoch_split = []
+	val_loss_split = []
+	prev_index = 0
+	for i in range(1,len(val_epoch)):
+		if(val_epoch[i]<val_epoch[i-1]):
+			val_epoch_split.append(val_epoch[prev_index:i])
+			val_loss_split.append(val_loss[prev_index:i])
+			prev_index = i
+
+	for i in range(len(train_epoch_split)):
+		plt.plot(train_epoch_split[i], train_loss_split[i],label='train',color='b')
+	for i in range(len(val_epoch_split)):
+		plt.plot(val_epoch_split[i], val_loss_split[i],label='val',color='r')
+	
+	saved_epochs = []
+	saved_losses = []
+	best = val_epoch[0]
+	print(best)
+	for i in range(1,len(val_epoch)):
+		if(val_epoch[i]<best):
+			print('here')
+			saved_epochs.append(val_epoch[i])
+			saved_losses.append(val_loss[i])
+
+	plt.plot(saved_epochs,saved_losses,label='saved',color='g')
+
+
+	plt.title('History of Each Epoch')
+	plt.xlabel('Epoch')
+	plt.ylabel('Loss')
 	plt.legend()
 	plt.show()
 
