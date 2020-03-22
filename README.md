@@ -5,7 +5,7 @@ python train.py -h
 
 The program runs as follows:
   
-  if(example or save-all-figs):
+  if(example or save-all-figs):\s
     do example
   elif(test):
     do test
