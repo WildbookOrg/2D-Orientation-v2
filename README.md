@@ -3,7 +3,7 @@ Refactor and improvements from the original 2D orientation project
 
 python train.py -h
 
-example:
+example:\\
 python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 3 --animal seadragon --example
 
 training:
