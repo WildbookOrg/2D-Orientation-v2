@@ -4,8 +4,9 @@ Refactor and improvements from the original 2D orientation project
 python train.py -h
 
 The program runs as follows:
-  
+  '''
   if(example or save-all-figs):
+  '''
     do example
   elif(test):
     do test
