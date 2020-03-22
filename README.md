@@ -15,7 +15,9 @@ The program runs as follows:
 ### Option Descriptions
 ```
 --type: 
-used to specifify a unique name for different optimizations that arent uncluded in progress folder naming, otherwize it would write over a state dict that has different optimization parameters but the same name
+used to specifify a unique name for different optimizations that arent uncluded in  
+progress folder naming, otherwize it would write over a state dict that has different  
+optimization parameters but the same name
   options used to name progress folder:
     animal
     type
@@ -32,11 +34,14 @@ use pretrained weights from official pytorch densenet
 ```
 ```
 --separate-trig: 
-instead of estimating the angle theta, the network has two outputs corresponding to cos and sin of the angle theta, and uses arctan2 to obtain theta. This is important because it changes nClasses to 2 instead of 1. 
+instead of estimating the angle theta, the network has two outputs corresponding to  
+cos and sin of the angle theta, and uses arctan2 to obtain theta. This is important  
+because it changes nClasses to 2 instead of 1. 
 ```
 ```
 --degree loss: 
-only useful when determining if estimating the angle in degrees or radians increases accuracy
+only useful when determining if estimating the angle in degrees or radians increases  
+accuracy
 ```
 
 ### Example Usage
