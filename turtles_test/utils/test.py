@@ -47,7 +47,7 @@ def plot_confusion_matrix(y_pred, y_true, classes,
 	return ax
 
 
-def test_stats(args, all_pred, all_targ, all_labl, all_diff):
+def test_stats(args, all_pred, all_targ, all_diff):
 	# ===============================================
 	# print basic statistics
 	print("For 360 degrees:")
@@ -61,7 +61,7 @@ def test_stats(args, all_pred, all_targ, all_labl, all_diff):
 	print("max:",max(all_pred))
 	classes = np.arange(0,max(all_pred)+1)
 	plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
-	plt.title(("Regression Trig Component Loss"))
+	plt.title(("Regression Trig Component Error - "+str(args.animal).title()))
 	plt.xlabel("True Label")
 	plt.ylabel("Predicted Label")
 	plt.show()
@@ -72,7 +72,7 @@ def test_stats(args, all_pred, all_targ, all_labl, all_diff):
 	# hist,bins = np.histogram(all_diff,bins = bins_def)
 	plt.text(100,50,'mean: {:3f}\nmedian: {:3f}'.format(np.mean(all_diff),np.median(all_diff)))
 	plt.hist(all_diff,bins_def)
-	plt.title('Regression Trig Component Loss')
+	plt.title('Regression Trig Component Error - '+str(args.animal).title())
 	plt.xlabel('Difference Between Predicted and True Labels')
 	plt.ylabel('Frequency in Test Set')
 	plt.show()
@@ -91,7 +91,7 @@ def test_stats(args, all_pred, all_targ, all_labl, all_diff):
 	x25 = [8, 5, 7, 7, 8, 8, 8, 6]
 
 	plt.bar(np.arange(8), x)
-	plt.title('Regression Trig Component Loss')
+	plt.title('Regression Trig Component Error - '+str(args.animal).title())
 	plt.xlabel('Max Angle Difference Threshold ')
 	plt.ylabel('Number of Differences Less Than Threshold')
 	plt.show()

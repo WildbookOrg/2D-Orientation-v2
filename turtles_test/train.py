@@ -94,6 +94,9 @@ def arg_check(args):
 			print("Invalid class number provided, see -h for help")
 			exit(1)
 
+	if(args.separate_trig):
+		args.nClasses=2
+
 def example_function(model, args):
 	
 	test_dataset = Data_turtles(dataType='test2020',experiment_type='example', args = args)
@@ -355,36 +358,33 @@ def plot_loss_history(args):
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--batchSz', type=int, default=60)
-	parser.add_argument('--nEpochs', type=int, default=50)
-	parser.add_argument('--no-cuda', action='store_true')
-	parser.add_argument('--save')
-	parser.add_argument('--seed', type=int, default=1)
+	parser.add_argument('--batchSz', type=int, default=60, help='specify a batch size')
+	parser.add_argument('--nEpochs', type=int, default=25, help='specify a number of epochs')
 	parser.add_argument('--opt', type=str, default='adam', 
 							choices=('sgd', 'adam', 'rmsprop'))
-	parser.add_argument('--no-resume', action='store_true')
-	parser.add_argument('--example',action='store_true')
-	parser.add_argument('--type',default='regression')
-	parser.add_argument('--test',action='store_true')
-	parser.add_argument('--nClasses', type=int, default=1)
-	parser.add_argument('--data-type', type=str, default='turtles', 
-							choices=('turtles', 'mnist'))
-	parser.add_argument('--pretrain', action='store_true')
-	parser.add_argument('--separate-trig', action='store_true')
-	parser.add_argument('--degree-loss', action='store_true')
-	parser.add_argument('--device', type=int, default=0)
-	parser.add_argument('--save-all-figs', action='store_true')
+	parser.add_argument('--no-resume', action='store_true', help='delete current trained weights and train from scratch')
+	parser.add_argument('--example', action='store_true', help='show a visualization of a sample of the test set')
+	parser.add_argument('--type', default='regression', help='specify a network type to be used with directory saving')
+	parser.add_argument('--test', action='store_true', help='test the current weights and plot some statistics')
+	parser.add_argument('--nClasses', type=int, default=1, help='specify the number of classes (must be 1 for regression)')
+	parser.add_argument('--pretrain', action='store_true', help='used with --no-resume, load wiped network with densenet pretrained values')
+	parser.add_argument('--separate-trig', action='store_true', help='use the trig components (sin,cos) to estimate rotation, rather than theta')
+	parser.add_argument('--degree-loss', action='store_true',help='estimate orientation using sin cos components')
+	parser.add_argument('--device', type=int, default=0, choices=tuple(range(torch.cuda.device_count())), help='specify the cuda device to run on')
+	parser.add_argument('--save-all-figs', action='store_true', help='apply the example function to each test image and save in a directory') # TODO 
 	parser.add_argument('--animal', type=str, default='seaturtle', 
 							choices=('seaturtle', 'turtles1','seadragon','mantaray','rightwhale'))
-	parser.add_argument('--show', action='store_true')
+	parser.add_argument('--show', action='store_true',help='shows each image during dataloader stage to see annotation')
 	parser.add_argument('--plot-loss-history', action='store_true')
 	
-	
+	parser.add_argument('--lr', type=float, default=1e-4, help='specify the initial learning rate')
+	parser.add_argument('--angle-range', type=int, default=50, help='angle range to train with; within [2,360]')
+
 	args = parser.parse_args()
 
 
 	# save a bunch of constants to avoid confusion later
-	args.cuda = not args.no_cuda and torch.cuda.is_available()
+	args.cuda = torch.cuda.is_available()
 	args.save_path = 'work/densenet.%s.%s.%s%s/'%(args.animal,args.type,args.nClasses,'.pretrain' if args.pretrain else '')
 	args.save_file = '{}.{}.latest.pth'.format(args.type, args.nClasses)
 	args.pth_file = os.path.join(args.save_path,args.save_file)
@@ -607,10 +607,9 @@ def test(args, epoch, net):
 	test_loss = 0
 	all_pred = None
 	all_targ = None
-	all_labl = None
 	all_diff = None
 	i_major = 0
-	for data, display_image, target, label in dataloader:
+	for data, display_image, target in dataloader:
 		if args.cuda:
 			data, target = data.cuda(), target.cuda()
 		# data, target = Variable(data), Variable(target)
@@ -624,7 +623,7 @@ def test(args, epoch, net):
 			incorrect += pred.ne(target.data).cpu().sum()
 		if(args.type.startswith('regression')):
 			if(args.separate_trig):
-				test_loss = trig_loss(output.float(), target.float(), args)
+				test_loss += trig_loss(output.float(), target.float(), args)
 			else:
 				test_loss += mse(output, target.float()).data
 			pred = output.data.squeeze()
@@ -642,28 +641,25 @@ def test(args, epoch, net):
 		targn = target.cpu().numpy()
 
 		if(all_pred is None):
-			all_labl = label
 			all_pred = predn
 			all_targ = targn
 			all_diff = difference(args,predn, targn)
 		else:
-			all_labl = np.hstack((all_labl, label))
 			all_pred = np.hstack((all_pred, predn))
 			all_targ = np.hstack((all_targ, targn))
 			all_diff = np.hstack((all_diff, difference(args,predn, targn)))
 	
 		i_major+=args.batchSz
-		print(i_major,'/',904)
 
 	all_pred = np.where(all_pred>360,all_pred%360,all_pred)
 
-	test_stats(args, all_pred, all_targ, all_labl, all_diff)
+	test_stats(args, all_pred, all_targ, all_diff)
 
 	test_loss /= len(dataloader) # loss function already averages over batch size
 	nTotal = len(dataloader.dataset)
-	incorrect = len(np.where(all_diff>1)[0])
+	incorrect = len(np.where(all_diff>5)[0])
 	err = 100.*incorrect/nTotal
-	print('\nTest set: Average loss: {:.4f}, Error: {}/{} ({:.0f}%)\n'.format(
+	print('\nTest set: Average loss: {:.4f}, Error: {}/{} ({:.0f}%) > 5 deg\n'.format(
 		test_loss, incorrect, nTotal, err))# ===============================================
 	# distribution of error and label
 	
