@@ -3,8 +3,31 @@ Refactor and improvements from the original 2D orientation project
 
 python train.py -h
 
+The program runs as follows:
+  if(example or save-all-figs):
+    do example
+    exit
+  elif(test):
+    do test
+    exit
+  else:
+    train
+
 ### Option Descriptions
 --type: used to specifify a unique name for different optimizations that arent uncluded in progress folder naming, otherwize it would write over a state dict that has different optimization parameters but the same name
+  options used to name progress folder:
+    animal
+    type
+    nClasses
+    pretrain
+
+--no-resume: clean state dict and start training from scratch
+
+--pretrain: use pretrained weights from official pytorch densenet
+
+--separate-trig: instead of estimating the angle theta, the network has two outputs corresponding to cos and sin of the angle theta, and uses arctan2 to obtain theta. This is important because it changes nClasses to 2 instead of 1. 
+
+--degree loss: only useful when determining if estimating the angle in degrees or radians increases accuracy
 
 
 ### Example Usage
