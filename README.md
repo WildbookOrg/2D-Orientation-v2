@@ -5,12 +5,15 @@ python train.py -h
 
 The program runs as follows:
   if(example or save-all-figs):
+
     do example
-    exit
+    
   elif(test):
+  
     do test
-    exit
+  
   else:
+  
     train
 
 ### Option Descriptions
