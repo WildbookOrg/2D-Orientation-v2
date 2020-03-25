@@ -60,8 +60,11 @@ def test_stats(args, all_pred, all_targ, all_diff):
 	
 	print("max:",max(all_pred))
 	classes = np.arange(0,max(all_pred)+1)
+	trig = 'Trig Component ' if args.separate_trig and args.type=='regression' else ''
+	if(args.type=='classification' and not args.hierarchy):
+		trig = str(args.nClasses)+' '
 	plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
-	plt.title(("Regression Trig Component Error - "+str(args.animal).title()))
+	plt.title(("{} {}Error - ".format(args.type.title(),trig)+str(args.animal).title()))
 	plt.xlabel("True Label")
 	plt.ylabel("Predicted Label")
 	plt.show()
@@ -72,29 +75,29 @@ def test_stats(args, all_pred, all_targ, all_diff):
 	# hist,bins = np.histogram(all_diff,bins = bins_def)
 	plt.text(100,50,'mean: {:3f}\nmedian: {:3f}'.format(np.mean(all_diff),np.median(all_diff)))
 	plt.hist(all_diff,bins_def)
-	plt.title('Regression Trig Component Error - '+str(args.animal).title())
+	plt.title('{} {}Error - '.format(args.type.title(),trig)+str(args.animal).title())
 	plt.xlabel('Difference Between Predicted and True Labels')
 	plt.ylabel('Frequency in Test Set')
 	plt.show()
 
 	# ===============================================
 	# histogram of frequency below some difference thresh
-	x = np.array([554,296,150,71,37,23,17,16])
-	x1=[541, 580, 570, 555, 543, 529, 568, 553]
-	x2=[306, 298, 289, 306, 284, 286, 302, 301]
-	x3 = [146, 141, 157, 167, 148, 146, 148, 148]
-	x4 = [64, 70, 76, 69, 82, 67, 70, 70]
-	x5 = [29, 42, 36, 30, 37, 52, 40, 37]
-	x6 = [20, 26, 25, 26, 24, 24, 21, 23]
-	x7 = [25, 17, 18, 14, 15, 18, 16, 13]
-	x8 = [15, 18, 15, 13, 22, 11, 21, 23]
-	x25 = [8, 5, 7, 7, 8, 8, 8, 6]
+	# x = np.array([554,296,150,71,37,23,17,16])
+	# x1=[541, 580, 570, 555, 543, 529, 568, 553]
+	# x2=[306, 298, 289, 306, 284, 286, 302, 301]
+	# x3 = [146, 141, 157, 167, 148, 146, 148, 148]
+	# x4 = [64, 70, 76, 69, 82, 67, 70, 70]
+	# x5 = [29, 42, 36, 30, 37, 52, 40, 37]
+	# x6 = [20, 26, 25, 26, 24, 24, 21, 23]
+	# x7 = [25, 17, 18, 14, 15, 18, 16, 13]
+	# x8 = [15, 18, 15, 13, 22, 11, 21, 23]
+	# x25 = [8, 5, 7, 7, 8, 8, 8, 6]
 
-	plt.bar(np.arange(8), x)
-	plt.title('Regression Trig Component Error - '+str(args.animal).title())
-	plt.xlabel('Max Angle Difference Threshold ')
-	plt.ylabel('Number of Differences Less Than Threshold')
-	plt.show()
+	# plt.bar(np.arange(8), x)
+	# plt.title('{} {}Error - '.format(args.type.title(),trig)+str(args.animal).title())
+	# plt.xlabel('Max Angle Difference Threshold ')
+	# plt.ylabel('Number of Differences Less Than Threshold')
+	# plt.show()
 
 
 	# ===============================================

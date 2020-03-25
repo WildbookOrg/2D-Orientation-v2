@@ -4,8 +4,8 @@ import torchvision.transforms as transforms
 
 
 def get_angle(args):
-	if(args.type=='regression45'):
-		angle = int(np.random.uniform(-45,45,1))
+	if(args.angle_range!=360):
+		angle = int(np.random.uniform(-args.angle_range,args.angle_range,1))
 		if(angle<0):
 			angle=360+angle
 	else:
@@ -131,6 +131,7 @@ class Data_turtles():
 			# nCalsses should be a factor of 360
 			angle = int(angle/int(360/self.args.nClasses))
 
+		
 		if(self.experiment_type=='test' or self.experiment_type=='example'):
 			image = rotate_im(image,theta)
 			image = transforms.ToPILImage()(image)

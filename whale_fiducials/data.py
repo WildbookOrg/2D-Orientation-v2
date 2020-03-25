@@ -121,7 +121,7 @@ class Data():
 		self.args = args
 
 		# load and clean images
-		self.dataDir = '../datasets/whales/'
+		self.dataDir = '../datasets/whale_keypoints/'
 		keypoints = np.genfromtxt(self.dataDir+'keypoints.csv', delimiter=',', skip_header=True, dtype=str)
 		filenames = keypoints[:,0]
 		keypoints = keypoints[:,1:]

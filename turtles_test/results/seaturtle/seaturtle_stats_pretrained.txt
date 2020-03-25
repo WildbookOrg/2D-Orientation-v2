@@ -1,6 +1,0 @@
-mean: 4.575363729451154
-standard deviation: 9.658896965111692
-median: 2.399852752685547
-max: 356.15323
-
-Test set: Average loss: 0.0068, Error: 46/223 (21%) > 5 deg

@@ -1,0 +1,16 @@
+
+Regression Pretrained Trig Comp ===================
+mean: 4.575363729451154
+standard deviation: 9.658896965111692
+median: 2.399852752685547
+max: 356.15323
+
+Test set: Average loss: 0.0068, Error: 46/223 (21%) > 5 deg
+
+Classification 8 Pretrained ====================
+mean: 0.065
+standard deviation: 0.5298820623497269
+median: 0.0
+max: 7
+
+Test set: Average loss: 1.7950, Error: 1/223 (0%) > 5 deg

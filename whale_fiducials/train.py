@@ -236,8 +236,10 @@ def test(args, model, dataloader, datafile, loss_func, phase):
 	plt.title('X and Y Error Respective of Axis')
 	plt.xlabel('Error X')
 	plt.ylabel('Error Y')
+	plt.grid()
 	plt.scatter(x1, y1, s=80, alpha=0.6, label=('Left Tip X & Y'), facecolors='none', edgecolors='r')
 	plt.scatter(x2, y2, s=80, alpha=0.3, label=('Right Tip X & Y'), facecolors='none', edgecolors='b')
 	plt.scatter(x1[:n//5], y1[:n//5], s=80, alpha=0.2, facecolors='none', edgecolors='r')
 	plt.legend()
+	
 	plt.show()
