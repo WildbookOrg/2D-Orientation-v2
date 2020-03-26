@@ -115,19 +115,23 @@ def example_function(model, args):
 	data = data.to(args.device)
 	target = target.to(args.device)
 
-	output = model(data)
-	output = output.cpu()
-	print(output)
-	print(target)
+	# if(args.hierarchy):
 
-	if(args.type.startswith('classification')):
-		pred = output.data.max(1)[1] # get the index of the max log-probability
-		print(pred*(360//args.nClasses))
-	if(args.type.startswith('regression')):
-		if(args.separate_trig):
-			pred = separate_trig_to_angle(output, args)
-		else:
-			pred = output.data.reshape((1,args.batchSz))[0]
+
+
+	# else:
+	# 	output = model(data)
+	# 	output = output.cpu()
+	# 	print(output)
+	# 	print(target)
+	# 	if(args.type.startswith('classification')):
+	# 		pred = output.data.max(1)[1] # get the index of the max log-probability
+	# 		print(pred*(360//args.nClasses))
+	# 	if(args.type.startswith('regression')):
+	# 		if(args.separate_trig):
+	# 			pred = separate_trig_to_angle(output, args)
+	# 		else:
+	# 			pred = output.data.reshape((1,args.batchSz))[0]
 
 
 	print(pred)
@@ -492,18 +496,20 @@ def main():
 			for phase in ['train','val']:
 				val_loss,val_loss_reg = train_hierarchy(args, epoch, [model,model_reg], dataloaders[phase], [optimizer,optimizer_reg], datafiles[phase], [loss_func,loss_func_reg], phase)
 				
-			if(val_loss<best_val_loss):
-				print("Saving Class State Dict: new loss is",val_loss)
-				best_val_loss = val_loss
-				torch.save(model.state_dict(), args.pth_file)
-			else:
-				print('Class loss was:', val_loss)
-				print()
+			# if(val_loss<best_val_loss):
+			# 	print("Saving Class State Dict: new loss is",val_loss)
+			# 	best_val_loss = val_loss
+			# 	torch.save(model.state_dict(), args.pth_file)
+			# else:
+			# 	print('Class loss was:', val_loss)
+			# 	print()
 
 			if(val_loss_reg<best_val_loss_reg):
-				print("Saving Reg State Dict: new loss is",val_loss_reg)
+				print("Saving Reg State Dicts: new loss is",val_loss_reg)
 				best_val_loss_reg = val_loss_reg
+				torch.save(model.state_dict(), args.pth_file)
 				torch.save(model_reg.state_dict(), args.pth_file_reg)
+				
 			else:
 				print('Reg loss was:', val_loss_reg)
 				print()
@@ -674,6 +680,7 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 		optimizer.zero_grad()
 		optimizer_reg.zero_grad()
 		
+		print()
 		# =======================================
 		# Classification step of hierarchy 
 		output = net(data)
@@ -687,6 +694,8 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 		pred = output.data.max(1)[1] # get the index of the max log-probability
 		# incorrect += pred.ne(target.data).cpu().sum()
 		err = torch.mean(abs(pred.float() - target.float()))
+		print('class loss:',loss.item())
+		print('class err:',err.item())
 		val_loss += loss
 		
 		if(phase == 'train'):
@@ -706,20 +715,26 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 
 		# =======================================
 		# Regression step of hierarchy 
-		output = net_reg(data)
-		target = target_reg
-		
-		loss_reg = loss_func_reg(output.float(), target.float(), args)
+		output_reg = net_reg(data)
+
+		print(output_reg)
+		print(target_reg)
+		print(loss_func_reg)
+		loss_reg = loss_func_reg(output_reg.float(), target_reg.float(), args)
+		print('reg loss',loss_reg.item())
 		val_loss_reg += loss_reg
-		pred = output.data.squeeze()
+		pred = output_reg.data.squeeze()
 
 		if(args.separate_trig):
-			err = torch.mean(abs(output.float() - angle_to_separate_trig(target.float(), args)))
+			err = torch.mean(abs(output_reg.float() - angle_to_separate_trig(target_reg.float(), args)))
 		else:
-			err = torch.mean(abs(output.float().squeeze() - target.float()))
+			err = torch.mean(abs(output_reg.float().squeeze() - target_reg.float()))
+		print('reg err:',err.item())
 		if(phase == 'train'):
 			loss_reg.backward()
 			optimizer_reg.step()
+
+		print()
 
 	
 			
