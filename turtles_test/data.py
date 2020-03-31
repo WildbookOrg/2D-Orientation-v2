@@ -98,22 +98,28 @@ class Data_turtles():
 			# =============================================
 			# original image
 			self.ax = plt.gca()
-			self.show_annotation(poly)
-			self.show_MER(mer)
+			# self.show_annotation(poly)
+			# self.show_MER(mer)
+			plt.axis('off')
 			plt.imshow(image)
 			plt.show()
 			# =============================================
 			# rotated image
 			I_rot = rotate_im(image,theta)
-			self.ax = plt.gca()
-			self.show_MER(mer_rot)
-			self.show_annotation(mir)
+			# self.ax = plt.gca()
+			# self.show_MER(mer_rot)
+			# self.show_annotation(mir)
+			# plt.imshow(I_rot)
+			# plt.show()
+			# # =============================================
+			# # final cropped image
+			# I_cropped = I_rot[mir[0,1]:mir[2,1],mir[0,0]:mir[2,0]]
+			# plt.imshow(I_cropped)
+			# plt.show()
+
+
 			plt.imshow(I_rot)
-			plt.show()
-			# =============================================
-			# final cropped image
-			I_cropped = I_rot[mir[0,1]:mir[2,1],mir[0,0]:mir[2,0]]
-			plt.imshow(I_cropped)
+			plt.axis('off')
 			plt.show()
 			# ==============================================
 

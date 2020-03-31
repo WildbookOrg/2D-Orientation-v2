@@ -59,25 +59,54 @@ def test_stats(args, all_pred, all_targ, all_diff):
 	# plot confusion matrix plot
 	
 	print("max:",max(all_pred))
-	classes = np.arange(0,max(all_pred)+1)
+	
+
+	# classes = np.arange(0,max(max(all_pred),max(all_targ))+1)
 	trig = 'Trig Component ' if args.separate_trig and args.type=='regression' else ''
-	if(args.type=='classification' and not args.hierarchy):
-		trig = str(args.nClasses)+' '
-	plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
-	plt.title(("{} {}Error - ".format(args.type.title(),trig)+str(args.animal).title()))
-	plt.xlabel("True Label")
-	plt.ylabel("Predicted Label")
-	plt.show()
+	# if(args.type=='classification' and not args.hierarchy):
+	# 	trig = str(args.nClasses)+' '
+	# plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
+	# plt.title(("{} {}Error - ".format(args.type.title(),trig)+str(args.animal).title()))
+	# plt.xlabel("True Label")
+	# plt.ylabel("Predicted Label")
+	# plt.show()
+
+	# print(list(all_diff))
 
 	# ===============================================
 	# Plot error histogram
 	bins_def = np.arange(max(360,np.max(all_diff)))
 	# hist,bins = np.histogram(all_diff,bins = bins_def)
-	plt.text(100,50,'mean: {:3f}\nmedian: {:3f}'.format(np.mean(all_diff),np.median(all_diff)))
-	plt.hist(all_diff,bins_def)
-	plt.title('{} {}Error - '.format(args.type.title(),trig)+str(args.animal).title())
+	# plt.text(100,50,'mean: {:3f}\nmedian: {:3f}'.format(np.mean(all_diff),np.median(all_diff)))
+	
+	hist,bins = np.histogram(all_diff,bins = bins_def)
+
+	f, (ax,ax2) = plt.subplots(2, 1, sharex=True)
+	ax.hist(all_diff,bins_def)
+	ax2.hist(all_diff,bins_def)
+	ax.set_ylim(max(hist)-max(hist)*.2, max(hist)+max(hist)*.1)
+	ax2.set_ylim(0, max(hist)*.2)
+	ax2.legend().set_visible(False)
+
+	ax.spines['bottom'].set_visible(False)
+	ax2.spines['top'].set_visible(False)
+	ax.xaxis.tick_top()
+	ax.tick_params(labeltop='off')
+	ax2.xaxis.tick_bottom()
+	d = .015
+	kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+	ax.plot((-d,+d),(-d,+d), **kwargs)
+	ax.plot((1-d,1+d),(-d,+d), **kwargs)
+	kwargs.update(transform=ax2.transAxes)
+	ax2.plot((-d,+d),(1-d,1+d), **kwargs)
+	ax2.plot((1-d,1+d),(1-d,1+d), **kwargs)
+
+	# plt.hist(all_diff,bins_def)
+	t = '{} {}Error - '.format(args.type.title(),trig)+str(args.animal).title()
+	ax.set_title(t)
 	plt.xlabel('Difference Between Predicted and True Labels')
-	plt.ylabel('Frequency in Test Set')
+	# plt.ylabel('Frequency in Test Set')
+	f.text(0.04, 0.5, 'Frequency in Test Set', va='center', rotation='vertical')
 	plt.show()
 
 	# ===============================================

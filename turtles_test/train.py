@@ -115,23 +115,25 @@ def example_function(model, args):
 	data = data.to(args.device)
 	target = target.to(args.device)
 
-	# if(args.hierarchy):
+	# grid = utils.make_grid(images)
+	# plt.imshow(grid.numpy().transpose((1, 2, 0)))
+	# plt.axis('off')
+	# # plt.title(args.type+'\nPred: {}\nTrue: {}'.format(angles.detach().cpu().numpy(),pred.detach().cpu().int().numpy()))
+	# plt.show()
 
-
-
-	# else:
-	# 	output = model(data)
-	# 	output = output.cpu()
-	# 	print(output)
-	# 	print(target)
-	# 	if(args.type.startswith('classification')):
-	# 		pred = output.data.max(1)[1] # get the index of the max log-probability
-	# 		print(pred*(360//args.nClasses))
-	# 	if(args.type.startswith('regression')):
-	# 		if(args.separate_trig):
-	# 			pred = separate_trig_to_angle(output, args)
-	# 		else:
-	# 			pred = output.data.reshape((1,args.batchSz))[0]
+	
+	output = model(data)
+	output = output.cpu()
+	print(output)
+	print(target)
+	if(args.type.startswith('classification')):
+		pred = output.data.max(1)[1] # get the index of the max log-probability
+		print(pred*(360//args.nClasses))
+	if(args.type.startswith('regression')):
+		if(args.separate_trig):
+			pred = separate_trig_to_angle(output, args)
+		else:
+			pred = output.data.reshape((1,args.batchSz))[0]
 
 
 	print(pred)
