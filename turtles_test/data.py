@@ -4,7 +4,7 @@ import torchvision.transforms as transforms
 
 
 def get_angle(args):
-	if(args.angle_range!=360):
+	if(args is not None and args.angle_range!=360):
 		angle = int(np.random.uniform(-args.angle_range,args.angle_range,1))
 		if(angle<0):
 			angle=360+angle
@@ -32,8 +32,11 @@ def rgb2gray(rgb):
 class Data_turtles():
 	def __init__(self, dataDir = None, dataType='train2020',
 					experiment_type = '', args = None):
+		
 		if(dataDir == None):
 			self.dataDir = '../datasets/{}/orientation.{}.coco'.format(args.animal,args.animal)
+		else:
+			self.dataDir = dataDir
 		self.dataType = dataType
 		self.annFile='{}/annotations/instances_{}.json'.format(self.dataDir,dataType)
 		self.coco=COCO(self.annFile)
@@ -71,7 +74,7 @@ class Data_turtles():
 		# print(poly)
 		# print(theta)
 
-		resize_to = 32
+		resize_to = 128
 		angle = get_angle(self.args)
 				
 		theta = theta*180/np.pi
@@ -94,7 +97,7 @@ class Data_turtles():
 		I = I[mir[0,1]:mir[2,1],mir[0,0]:mir[2,0]]
 
 		# show the stages of cropping the image
-		if(self.args.show):
+		if( self.args is not None and self.args.show):
 			# =============================================
 			# original image
 			self.ax = plt.gca()
@@ -123,6 +126,8 @@ class Data_turtles():
 			plt.show()
 			# ==============================================
 
+
+
 		I = transforms.ToPILImage()(I)
 		I = transforms.Resize((resize_to,resize_to))(I)
 		I = transforms.functional.affine(I,angle,(0,0),1,0)
@@ -133,17 +138,19 @@ class Data_turtles():
 		
 		
 
-		if(self.args.type.startswith('classification')):
+		if(self.args is not None and self.args.type.startswith('classification')):
 			# nCalsses should be a factor of 360
 			angle = int(angle/int(360/self.args.nClasses))
 
 		
-		if(self.experiment_type=='test' or self.experiment_type=='example'):
+		if(self.args is not None and self.experiment_type=='test' or self.experiment_type=='example'):
 			image = rotate_im(image,theta)
 			image = transforms.ToPILImage()(image)
 			image = transforms.Resize((128,128))(image)
 			image = transforms.functional.affine(image,angle,(0,0),1,0)
 			image = transforms.ToTensor()(image)
+			# plt.imshow(image_normalized.permute(1, 2, 0)*255)
+			# plt.show()
 			return image_normalized, image, angle
 
 		# during training 
