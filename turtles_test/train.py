@@ -260,9 +260,14 @@ def save_all_figures(model, args):
 
 
 def get_data_loaders(args):
-	train_dataset = Data_turtles(dataType = 'train2020', experiment_type='train', args = args)
-	val_dataset = Data_turtles(dataType = 'val2020', experiment_type='validation', args = args)
-	test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
+	if(args.hierarchy):
+		train_dataset = Data_turtles(dataType = 'train2020', experiment_type='test', args = args)
+		val_dataset = Data_turtles(dataType = 'val2020', experiment_type='test', args = args)
+		test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
+	else:
+		train_dataset = Data_turtles(dataType = 'train2020', experiment_type='train', args = args)
+		val_dataset = Data_turtles(dataType = 'val2020', experiment_type='validation', args = args)
+		test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
 
 	dataloaders = {
 		'train' : DataLoader(train_dataset,batch_size=args.batchSz,shuffle=True,drop_last=True),
@@ -736,6 +741,7 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 	nProcessed = 0
 	incorrect = 0
 	nTrain = len(dataloader.dataset)
+<<<<<<< HEAD
 	with torch.set_grad_enabled(phase=='train'):
 		for batch_idx, (data, target) in enumerate(dataloader):
 
@@ -796,6 +802,111 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 			# print('class err:',err.item())
 			# print('reg loss',loss_reg.item())
 			# print('reg err:',err.item())
+=======
+	for batch_idx, (data, image, target) in enumerate(dataloader):
+		print(0,'\t',torch.cuda.memory_allocated(args.device)//1000000)
+
+
+		target_reg = target.cuda()
+		target = torch.Tensor([int(angle/int(360/args.nClasses)) for angle in target]).long()
+
+		# plt.imshow(data[0].permute(1,2,0)*255)
+		# plt.title('train0')
+		# plt.show()
+
+		nProcessed += len(data)
+		if args.cuda:
+			data, target = data.cuda(), target.cuda()
+		# data, target = Variable(data), Variable(target)
+		data = data.to(args.device)
+		target = target.to(args.device)
+
+		print(1,'\t',torch.cuda.memory_allocated(args.device)//1000000)
+
+
+		optimizer.zero_grad()
+		optimizer_reg.zero_grad()
+		
+		print()
+
+		
+		# =======================================
+		# Classification step of hierarchy 
+		output = net(data)
+		print(2,'\t',torch.cuda.memory_allocated(args.device)//1000000)
+
+
+		# print(output)
+		# print(target)
+			
+		loss = loss_func(output, target)
+
+		pred = output.data.max(1)[1] # get the index of the max log-probability
+		# incorrect += pred.ne(target.data).cpu().sum()
+		err = torch.mean(abs(pred.float() - target.float()))
+		val_loss += loss
+		
+		if(phase == 'train'):
+			loss.backward()
+			optimizer.step()
+
+		print(3,'\t',torch.cuda.memory_allocated(args.device)//1000000)
+
+		# =======================================
+		# Handle transition between levels
+		# rotate data by output
+		pred = output.data.max(1)[1] # get the index of the max log-probability
+		# print(pred*(360//args.nClasses))
+
+
+		# data = [transforms.ToPILImage()(image.cpu().detach()*255) for image in data]	
+		# data = [transforms.functional.affine(image,-angle,(0,0),1,0) for image,angle in zip(data,pred)]
+			
+		# # plt.imshow(transforms.ToTensor()(data[0]).permute(1,2,0))
+		# # plt.title('train1')
+		# # plt.show()
+
+		# data = torch.stack([transforms.ToTensor()(image) for image in data])
+		
+		# # plt.imshow(data[0].permute(1,2,0))
+		# # plt.title('train2')
+		# # plt.show()
+
+		# data = data/255
+		# data = data.cuda()
+
+		# =======================================
+		# Regression step of hierarchy 
+
+
+		output_reg = net_reg(data)
+		print(4,'\t',torch.cuda.memory_allocated(args.device)//1000000)
+		# print(output_reg)
+		# print(target_reg)
+		loss_reg = loss_func_reg(output_reg.float(), target_reg.float(), args)
+		
+		val_loss_reg += loss_reg
+		pred = output_reg.data.squeeze()
+
+		if(args.separate_trig):
+			err = torch.mean(abs(output_reg.float() - angle_to_separate_trig(target_reg.float(), args)))
+		else:
+			err = torch.mean(abs(output_reg.float().squeeze() - target_reg.float()))
+		
+		if(phase == 'train'):
+			loss_reg.backward()
+			optimizer_reg.step()
+
+		print(5,'\t',torch.cuda.memory_allocated(args.device)//1000000)
+
+		# print('class loss:',loss.item())
+		# print('class err:',err.item())
+		# print('reg loss',loss_reg.item())
+		# print('reg err:',err.item())
+
+
+		print()
+>>>>>>> 8ec182cbc65b63c3a8d9d6cf038d3a7cfbec5f88
 
 			partialEpoch = epoch + batch_idx / len(dataloader) - 1
 			print(phase+': {:.2f} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tError: {:.6f}'.format(
@@ -803,8 +914,13 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 				loss.data, err.item()))
 
 
+<<<<<<< HEAD
 			datafile.write('{},{},{}\n'.format(partialEpoch, loss.data, loss_reg.data))
 			datafile.flush()	
+=======
+		datafile.write('{},{},{}\n'.format(partialEpoch, loss.item(), loss_reg.item()))
+		datafile.flush()	
+>>>>>>> 8ec182cbc65b63c3a8d9d6cf038d3a7cfbec5f88
 
 		datafile.write('{},{}\n'.format(epoch,val_loss))
 		print(epoch,val_loss)
