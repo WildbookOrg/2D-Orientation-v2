@@ -71,7 +71,7 @@ class Data_turtles():
 		# print(poly)
 		# print(theta)
 
-		resize_to = 32
+		resize_to = 128
 		angle = get_angle(self.args)
 				
 		theta = theta*180/np.pi

@@ -136,3 +136,82 @@ def test_stats(args, all_pred, all_targ, all_diff):
 	# ===============================================
 	# find worst errors and save them
 
+
+def test_stats_hierarchy(args, all_pred, all_targ, all_diff, all_pred_reg, all_targ_reg, all_diff_reg):
+	# ===============================================
+	# print basic statistics
+	print("Classification:")
+	print("mean:",np.mean(all_diff))
+	print("standard deviation:",np.std(all_diff))
+	print("median:",np.median(all_diff))
+	print("max:",max(all_pred))
+
+	print("Regression:")
+	print("mean:",np.mean(all_diff_reg))
+	print("standard deviation:",np.std(all_diff_reg))
+	print("median:",np.median(all_diff_reg))
+	print("max:",max(all_pred_reg))
+
+	# ===============================================
+	# plot confusion matrix plot
+	
+	
+	
+
+	classes = np.arange(0,max(max(all_pred),max(all_targ))+1)
+	trig = 'Trig Component ' if args.separate_trig and args.type=='regression' else ''
+	if(args.type=='classification' and not args.hierarchy):
+		trig = str(args.nClasses)+' '
+	plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
+	plt.title(("Hierarchy Classification ({} Class) Error - ".format(args.nClasses)+str(args.animal).title()))
+	plt.xlabel("True Label")
+	plt.ylabel("Predicted Label")
+	plt.show()
+
+	classes = np.arange(0,max(max(all_pred_reg),max(all_targ_reg))+1)
+	trig = 'Trig Component ' if args.separate_trig and args.type=='regression' else ''
+	if(args.type=='classification' and not args.hierarchy):
+		trig = str(args.nClasses)+' '
+	plot_confusion_matrix(all_pred_reg.astype(np.int32), all_targ_reg.astype(np.int32), classes)
+	plt.title(("Hierarchy Regression ({} Class) Error - ".format(args.nClasses)+str(args.animal).title()))
+	plt.xlabel("True Label")
+	plt.ylabel("Predicted Label")
+	plt.show()
+
+
+	# ===============================================
+	# Plot error histogram
+	bins_def = np.arange(max(360,np.max(all_diff_reg)))
+	# hist,bins = np.histogram(all_diff_reg,bins = bins_def)
+	# plt.text(100,50,'mean: {:3f}\nmedian: {:3f}'.format(np.mean(all_diff_reg),np.median(all_diff_reg)))
+	
+	hist,bins = np.histogram(all_diff_reg,bins = bins_def)
+
+	f, (ax,ax2) = plt.subplots(2, 1, sharex=True)
+	ax.hist(all_diff_reg,bins_def)
+	ax2.hist(all_diff_reg,bins_def)
+	ax.set_ylim(max(hist)-max(hist)*.2, max(hist)+max(hist)*.1)
+	ax2.set_ylim(0, max(hist)*.2)
+	ax2.legend().set_visible(False)
+
+	ax.spines['bottom'].set_visible(False)
+	ax2.spines['top'].set_visible(False)
+	ax.xaxis.tick_top()
+	ax.tick_params(labeltop='off')
+	ax2.xaxis.tick_bottom()
+	d = .015
+	kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+	ax.plot((-d,+d),(-d,+d), **kwargs)
+	ax.plot((1-d,1+d),(-d,+d), **kwargs)
+	kwargs.update(transform=ax2.transAxes)
+	ax2.plot((-d,+d),(1-d,1+d), **kwargs)
+	ax2.plot((1-d,1+d),(1-d,1+d), **kwargs)
+
+	t = 'Hierarchy Regression Error - '+str(args.animal).title()
+	ax.set_title(t)
+	plt.xlabel('Difference Between Predicted and True Labels')
+	f.text(0.04, 0.5, 'Frequency in Test Set', va='center', rotation='vertical')
+	plt.show()
+
+
+

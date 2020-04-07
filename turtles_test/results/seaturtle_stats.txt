@@ -14,3 +14,27 @@ median: 0.0
 max: 7
 
 Test set: Average loss: 1.7950, Error: 1/223 (0%) > 5 deg
+
+Hierarchy 8 Pretrained ====================
+Classification:
+mean: 0.09545454545454546
+standard deviation: 0.6288353395742964
+median: 0.0
+max: 7
+Regression:
+mean: 11.965969010307031
+standard deviation: 28.597981784519867
+median: 3.603062629699707
+max: 359.6109
+
+
+hierarchy 4 example
+tensor([1, 6, 4, 2])
+tensor([1, 6, 4, 2])
+
+tensor([33.3467, 24.7769, 31.2344, 31.7506])
+tensor([30, 25, 31, 32])
+tensor([ 75, 295, 211, 122])
+
+
+

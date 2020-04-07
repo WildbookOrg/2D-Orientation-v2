@@ -33,7 +33,7 @@ import sys
 import math
 import shutil
 
-from utils.test import test_stats
+from utils.test import *
 
 # imort data loader for both mnist and turtles
 from data import *
@@ -109,8 +109,7 @@ def example_function(model, args):
 	images_normalized, images, angles= next(test_iter)
 
 	if args.cuda:
-			images_normalized, angles = images_normalized.cuda(), angles.cuda()
-	data, target = Variable(images_normalized), Variable(angles)
+			data, target = images_normalized.cuda(), angles.cuda()
 	
 	data = data.to(args.device)
 	target = target.to(args.device)
@@ -147,6 +146,72 @@ def example_function(model, args):
 	plt.axis('off')
 	plt.title(args.type+'\nPred: {}\nTrue: {}'.format(angles.detach().cpu().numpy(),pred.detach().cpu().int().numpy()))
 	plt.show()  
+	# °
+
+def example_function_hierarchy(model, model_reg, args):
+	if(args.batchSz>8):
+		args.batchSz=8
+
+	# get image data
+	test_dataset = Data_turtles(dataType='test2020',experiment_type='example', args = args)
+	testLoader = DataLoader(test_dataset,batch_size=args.batchSz,shuffle=True)
+	test_iter = iter(testLoader)
+	images_normalized, images, target= next(test_iter)
+	if args.cuda:
+			data = images_normalized.cuda()
+	data = data.to(args.device)
+
+	model.eval()
+	model_reg.eval()
+
+	with torch.no_grad():
+		output = model(data).cpu()
+		pred = output.data.max(1)[1]
+
+		data = [transforms.ToPILImage()(image.cpu()*255) for image in data]	
+		data = [transforms.functional.affine(image,-angle*(360//args.nClasses),(0,0),1,0) for image,angle in zip(data,pred)]
+		data = torch.stack([transforms.ToTensor()(image).cuda() for image in data])/255
+		grid = utils.make_grid(data.cpu()).permute(1,2,0).numpy()*255
+		
+		target_reg = target - pred*(360/args.nClasses)
+
+		torch.where(target_reg<0,180+target_reg,target_reg)
+
+		output_reg = model_reg(data).cpu()
+		if(args.separate_trig):
+			output_reg = separate_trig_to_angle(output_reg, args)
+			
+		data = [transforms.ToPILImage()(image.cpu()*255) for image in data]	
+		data = [transforms.functional.affine(image,-angle,(0,0),1,0) for image,angle in zip(data,output_reg)]
+		data = torch.stack([transforms.ToTensor()(image).cuda() for image in data])/255
+		grid_reg = utils.make_grid(data.cpu()).permute(1,2,0).numpy()*255
+
+	print(pred.data)
+	print(target/(360/args.nClasses))
+	print()
+	print(output_reg.data)
+	print(target_reg.data)
+	print(target)
+	
+	plt.imshow(grid)
+	plt.axis('off')
+	plt.title("Classification ({} Class) - {}\nPred: {}\nTrue: {}".format(args.nClasses,args.animal,pred.data.numpy(),(target/(360/args.nClasses)).data.numpy()))
+	plt.show()
+	plt.imshow(grid_reg)
+	plt.axis('off')
+	plt.title('Regression - {}\nPred: {}\nTrue: {}'.format(args.animal,output_reg.int().data.numpy(),target_reg.data.numpy()))
+	plt.show()
+
+
+
+	# f, (ax,ax2) = plt.subplots(2, 1, sharex=True)
+	# ax.imshow(grid)
+	# ax2.imshow(grid)
+	# ax.set_title("Classification ({} Class) - {}".format(args.nClasses,args.animal))
+	# ax2.set_title("Regression Output - {}".format(args.nClasses,args.animal))
+	# ax.axis('off')
+	# ax2.axis('off')
+	# plt.show() 
 
 def save_all_figures(model, args):
 	test_dataset = Data_turtles(dataType='test2020',experiment_type='example', args = args)
@@ -400,7 +465,7 @@ def main():
 
 	if(args.hierarchy):
 		args.save_file_reg = '{}.{}.latest.pth'.format(args.type, 1)
-		args.pth_file_reg = os.path.join(args.save_path,args.save_file)
+		args.pth_file_reg = os.path.join(args.save_path,args.save_file_reg)
 
 	arg_check(args)
 
@@ -448,7 +513,7 @@ def main():
 
 	if args.example:
 		if(args.hierarchy):
-			example_function([model,model_reg],args)
+			example_function_hierarchy(model,model_reg,args)
 		else:
 			example_function(model, args)
 		exit(1)
@@ -456,9 +521,23 @@ def main():
 	# load files to track loss progress
 	datafiles = get_text_files(args)
 
+	if(args.type.startswith('classification') or args.hierarchy):
+		loss_func = F.nll_loss
+	elif(args.separate_trig):
+		loss_func = trig_loss
+	else:
+		loss_func = mse
+
+	if(args.hierarchy):
+		if(args.separate_trig):
+			loss_func_reg = trig_loss
+		else:
+			loss_func_reg = mse
+
+
 	if(args.test):
 		if(args.hierarchy):
-			test(args, 1, [model,model_reg])
+			test_hierarchy(args, 1, model,model_reg,loss_func,loss_func_reg)
 		else:
 			test(args, 1, model)
 		exit(1)
@@ -474,19 +553,7 @@ def main():
 	if(args.hierarchy):
 		optimizer_reg = get_optimizer(model_reg,args)
 	
-	if(args.type.startswith('classification') or args.hierarchy):
-		loss_func = F.nll_loss
-	elif(args.separate_trig):
-		loss_func = trig_loss
-	else:
-		loss_func = mse
-
-	if(args.hierarchy):
-		if(args.separate_trig):
-			loss_func_reg = trig_loss
-		else:
-			loss_func_reg = mse
-
+	
 	if(args.hierarchy):
 
 		best_val_loss,best_val_loss_reg = train_hierarchy(args, 0, [model,model_reg], dataloaders['val'], [optimizer,optimizer_reg], datafiles['val'], [loss_func,loss_func_reg], 'val')
@@ -498,18 +565,18 @@ def main():
 			for phase in ['train','val']:
 				val_loss,val_loss_reg = train_hierarchy(args, epoch, [model,model_reg], dataloaders[phase], [optimizer,optimizer_reg], datafiles[phase], [loss_func,loss_func_reg], phase)
 				
-			# if(val_loss<best_val_loss):
-			# 	print("Saving Class State Dict: new loss is",val_loss)
-			# 	best_val_loss = val_loss
-			# 	torch.save(model.state_dict(), args.pth_file)
-			# else:
-			# 	print('Class loss was:', val_loss)
-			# 	print()
+			if(val_loss<best_val_loss):
+				print("Saving Class State Dict: new loss is",val_loss)
+				best_val_loss = val_loss
+				torch.save(model.state_dict(), args.pth_file)
+			else:
+				print('Class loss was:', val_loss)
+				print()
 
 			if(val_loss_reg<best_val_loss_reg):
 				print("Saving Reg State Dicts: new loss is",val_loss_reg)
 				best_val_loss_reg = val_loss_reg
-				torch.save(model.state_dict(), args.pth_file)
+				# torch.save(model.state_dict(), args.pth_file)
 				torch.save(model_reg.state_dict(), args.pth_file_reg)
 				
 			else:
@@ -603,50 +670,52 @@ def train(args, epoch, net, dataloader, optimizer, datafile, loss_func, phase):
 	nProcessed = 0
 	incorrect = 0
 	nTrain = len(dataloader.dataset)
-	for batch_idx, (data, target) in enumerate(dataloader):
-		nProcessed += len(data)
-		if args.cuda:
-			data, target = data.cuda(), target.cuda()
-		# data, target = Variable(data), Variable(target)
-		data = data.to(args.device)
-		target = target.to(args.device)
-		optimizer.zero_grad()
-		output = net(data)
+	with torch.set_grad_enabled(phase=='train'):
+		for batch_idx, (data, target) in enumerate(dataloader):
+			nProcessed += len(data)
+			if args.cuda:
+				data, target = data.cuda(), target.cuda()
+			# data, target = Variable(data), Variable(target)
+			data = data.to(args.device)
+			target = target.to(args.device)
+			if(phase=='train'):
+				optimizer.zero_grad()
+			output = net(data)
 
-		if(args.type.startswith('classification')):
-			loss = loss_func(output, target)
-			pred = output.data.max(1)[1] # get the index of the max log-probability
-			incorrect += pred.ne(target.data).cpu().sum()
-			err = torch.mean(abs(pred.float() - target.float()))
-			val_loss += loss
-		if(args.type.startswith('regression')):
-			loss = loss_func(output.float(), target.float(), args)
-			val_loss += loss
-			pred = output.data.squeeze()
+			if(args.type.startswith('classification')):
+				loss = loss_func(output, target)
+				pred = output.data.max(1)[1] # get the index of the max log-probability
+				incorrect += pred.ne(target.data).cpu().sum()
+				err = torch.mean(abs(pred.float() - target.float()))
+				val_loss += loss
+			if(args.type.startswith('regression')):
+				loss = loss_func(output.float(), target.float(), args)
+				val_loss += loss
+				pred = output.data.squeeze()
 
-			if(args.separate_trig):
-				err = torch.mean(abs(output.float() - angle_to_separate_trig(target.float(), args)))
-			else:
-				err = torch.mean(abs(output.float().squeeze() - target.float()))
-			
-			
-		if(phase == 'train'):
-			loss.backward()
-			optimizer.step()
+				if(args.separate_trig):
+					err = torch.mean(abs(output.float() - angle_to_separate_trig(target.float(), args)))
+				else:
+					err = torch.mean(abs(output.float().squeeze() - target.float()))
+				
+				
+			if(phase == 'train'):
+				loss.backward()
+				optimizer.step()
 
-	
-			
-		partialEpoch = epoch + batch_idx / len(dataloader) - 1
-		print(phase+': {:.2f} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tError: {:.6f}'.format(
-			partialEpoch, nProcessed, nTrain, 100. * batch_idx / len(dataloader),
-			loss.data, err.item()))
+		
+				
+			partialEpoch = epoch + batch_idx / len(dataloader) - 1
+			print(phase+': {:.2f} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tError: {:.6f}'.format(
+				partialEpoch, nProcessed, nTrain, 100. * batch_idx / len(dataloader),
+				loss.data, err.item()))
 
 
-		datafile.write('{},{},{}\n'.format(partialEpoch, loss.data, err))
-		datafile.flush()	
+			datafile.write('{},{},{}\n'.format(partialEpoch, loss.data, err))
+			datafile.flush()	
 
-	datafile.write('{},{}\n'.format(epoch,val_loss))
-	print(epoch,val_loss)
+		datafile.write('{},{}\n'.format(epoch,val_loss))
+		print(epoch,val_loss)
 
 	return val_loss
 
@@ -662,95 +731,83 @@ def train_hierarchy(args, epoch, net, dataloader, optimizer, datafile, loss_func
 		net.eval()
 		net_reg.eval()
 
-	# net = net.to(args.device)
-
 	val_loss = 0
 	val_loss_reg = 0
 	nProcessed = 0
 	incorrect = 0
 	nTrain = len(dataloader.dataset)
-	for batch_idx, (data, target) in enumerate(dataloader):
-		target_reg = target.cuda()
-		target = torch.Tensor([int(angle/int(360/args.nClasses)) for angle in target]).long()
+	with torch.set_grad_enabled(phase=='train'):
+		for batch_idx, (data, target) in enumerate(dataloader):
 
-		nProcessed += len(data)
-		if args.cuda:
-			data, target = data.cuda(), target.cuda()
-		# data, target = Variable(data), Variable(target)
-		data = data.to(args.device)
-		target = target.to(args.device)
-		optimizer.zero_grad()
-		optimizer_reg.zero_grad()
-		
-		print()
-		# =======================================
-		# Classification step of hierarchy 
-		output = net(data)
+			nProcessed += len(data)
+			if args.cuda:
+				data, target = data.cuda(), target.cuda()
+			data = data.to(args.device)
+			target = target.to(args.device)
 
-
-		# print(output)
-		# print(target)
+			if(phase=='train'):
+				optimizer.zero_grad()
+				optimizer_reg.zero_grad()
 			
-		loss = loss_func(output, target)
+			# print()
+			# =======================================
+			# Classification step of hierarchy 
+			output = net(data)
 
-		pred = output.data.max(1)[1] # get the index of the max log-probability
-		# incorrect += pred.ne(target.data).cpu().sum()
-		err = torch.mean(abs(pred.float() - target.float()))
-		print('class loss:',loss.item())
-		print('class err:',err.item())
-		val_loss += loss
-		
-		if(phase == 'train'):
-			loss.backward()
-			optimizer.step()
+			# target for classification, so use bins
+			loss = loss_func(output, target/(360/args.nClasses))
 
+			pred = output.data.max(1)[1] # get the index of the max log-probability
 
-		# =======================================
-		# Handle transition between levels
-		# rotate data by output
-		pred = output.data.max(1)[1] # get the index of the max log-probability
-		# print(pred*(360//args.nClasses))
-		data = [transforms.ToPILImage()(image.cpu()) for image in data]	
-		data = [transforms.functional.affine(image,-angle,(0,0),1,0) for image,angle in zip(data,pred)]
-		data = torch.stack([transforms.ToTensor()(image).cuda() for image in data])
-		
+			# print(output.data)
 
-		# =======================================
-		# Regression step of hierarchy 
-		output_reg = net_reg(data)
-
-		print(output_reg)
-		print(target_reg)
-		print(loss_func_reg)
-		loss_reg = loss_func_reg(output_reg.float(), target_reg.float(), args)
-		print('reg loss',loss_reg.item())
-		val_loss_reg += loss_reg
-		pred = output_reg.data.squeeze()
-
-		if(args.separate_trig):
-			err = torch.mean(abs(output_reg.float() - angle_to_separate_trig(target_reg.float(), args)))
-		else:
-			err = torch.mean(abs(output_reg.float().squeeze() - target_reg.float()))
-		print('reg err:',err.item())
-		if(phase == 'train'):
-			loss_reg.backward()
-			optimizer_reg.step()
-
-		print()
-
-	
+			err = torch.mean(abs(pred.float() - (target/(360/args.nClasses)).float()))
+			val_loss += loss
 			
-		partialEpoch = epoch + batch_idx / len(dataloader) - 1
-		print(phase+': {:.2f} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tError: {:.6f}'.format(
-			partialEpoch, nProcessed, nTrain, 100. * batch_idx / len(dataloader),
-			loss.data, err.item()))
+			if(phase == 'train'):
+				loss.backward()
+				optimizer.step()
+
+			# =======================================
+			# Handle transition between levels
+			# rotate data by output
+			data = [transforms.ToPILImage()(image.cpu()*255) for image in data]	
+			data = [transforms.functional.affine(image,-angle*(360//args.nClasses),(0,0),1,0) for image,angle in zip(data,pred)]
+			data = torch.stack([transforms.ToTensor()(image).cuda() for image in data])/255
+			# adjust target to newly rotated image
+			target -= pred*(360/args.nClasses)
+			torch.where(target<0,360-target,target)
+			# =======================================
+			# Regression step of hierarchy 
+			output_reg = net_reg(data)
+			loss_reg = loss_func_reg(output_reg.float(), target.float(), args)
+			val_loss_reg += loss_reg
+			pred = output_reg.data.squeeze()
+			if(args.separate_trig):
+				err = torch.mean(abs(output_reg.float() - angle_to_separate_trig(target.float(), args)))
+			else:
+				err = torch.mean(abs(output_reg.float().squeeze() - target.float()))
+			if(phase == 'train'):
+				loss_reg.backward()
+				optimizer_reg.step()
+
+			# print()
+			# print('class loss:',loss.item())
+			# print('class err:',err.item())
+			# print('reg loss',loss_reg.item())
+			# print('reg err:',err.item())
+
+			partialEpoch = epoch + batch_idx / len(dataloader) - 1
+			print(phase+': {:.2f} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tError: {:.6f}'.format(
+				partialEpoch, nProcessed, nTrain, 100. * batch_idx / len(dataloader),
+				loss.data, err.item()))
 
 
-		datafile.write('{},{},{}\n'.format(partialEpoch, loss.data, err))
-		datafile.flush()	
+			datafile.write('{},{},{}\n'.format(partialEpoch, loss.data, loss_reg.data))
+			datafile.flush()	
 
-	datafile.write('{},{}\n'.format(epoch,val_loss))
-	print(epoch,val_loss)
+		datafile.write('{},{}\n'.format(epoch,val_loss))
+		print(epoch,val_loss)
 
 	return val_loss,val_loss_reg
 
@@ -765,47 +822,45 @@ def test(args, epoch, net):
 	all_targ = None
 	all_diff = None
 	i_major = 0
-	for data, display_image, target in dataloader:
-		if args.cuda:
-			data, target = data.cuda(), target.cuda()
-		# data, target = Variable(data), Variable(target)
-		data = data.to(args.device)
-		target = target.to(args.device)
-		output = net(data)
+	with torch.no_grad():
+		for data, display_image, target in dataloader:
+			if args.cuda:
+				data, target = data.cuda(), target.cuda()
+			# data, target = Variable(data), Variable(target)
+			data = data.to(args.device)
+			target = target.to(args.device)
+			output = net(data)
 
-		if(args.type.startswith('classification')):
-			test_loss += F.nll_loss(output, target).data
-			pred = output.data.max(1)[1] # get the index of the max log-probability
-			incorrect += pred.ne(target.data).cpu().sum()
-		if(args.type.startswith('regression')):
-			if(args.separate_trig):
-				test_loss += trig_loss(output.float(), target.float(), args)
+			if(args.type.startswith('classification')):
+				test_loss += F.nll_loss(output, target).data
+				pred = output.data.max(1)[1] # get the index of the max log-probability
+				incorrect += pred.ne(target.data).cpu().sum()
+			if(args.type.startswith('regression')):
+				if(args.separate_trig):
+					test_loss += trig_loss(output.float(), target.float(), args)
+				else:
+					test_loss += mse(output, target.float()).data
+				pred = output.data.squeeze()
+
+				if(args.separate_trig):
+					err = torch.mean(abs(output.float() - angle_to_separate_trig(target.float(), args)))
+					pred = separate_trig_to_angle(pred, args)
+				else:
+					err = torch.mean(abs(output.float().squeeze() - target.float()))
+				
+			predn = pred.cpu().numpy()
+			targn = target.cpu().numpy()
+
+			if(all_pred is None):
+				all_pred = predn
+				all_targ = targn
+				all_diff = difference(args,predn, targn)
 			else:
-				test_loss += mse(output, target.float()).data
-			pred = output.data.squeeze()
-
-			if(args.separate_trig):
-				err = torch.mean(abs(output.float() - angle_to_separate_trig(target.float(), args)))
-				pred = separate_trig_to_angle(pred, args)
-			else:
-				err = torch.mean(abs(output.float().squeeze() - target.float()))
-			
-			
-
-
-		predn = pred.cpu().numpy()
-		targn = target.cpu().numpy()
-
-		if(all_pred is None):
-			all_pred = predn
-			all_targ = targn
-			all_diff = difference(args,predn, targn)
-		else:
-			all_pred = np.hstack((all_pred, predn))
-			all_targ = np.hstack((all_targ, targn))
-			all_diff = np.hstack((all_diff, difference(args,predn, targn)))
-	
-		i_major+=args.batchSz
+				all_pred = np.hstack((all_pred, predn))
+				all_targ = np.hstack((all_targ, targn))
+				all_diff = np.hstack((all_diff, difference(args,predn, targn)))
+		
+			i_major+=args.batchSz
 
 	all_pred = np.where(all_pred>360,all_pred%360,all_pred)
 
@@ -823,6 +878,104 @@ def test(args, epoch, net):
 	testF.write('{},{},{}\n'.format(epoch, test_loss, err))
 	testF.flush()
 	testF.close()
+
+def test_hierarchy(args, epoch, net, net_reg, loss_func, loss_func_reg):
+	test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
+	dataloader = DataLoader(test_dataset,batch_size=args.batchSz,shuffle=False, drop_last=True)
+	testF = open(os.path.join(args.save_path, 'test.csv'), 'w')
+	net.eval()
+	incorrect = 0
+	test_loss = 0
+	all_pred = None
+	all_targ = None
+	all_diff = None
+	test_loss_reg = 0
+	all_pred_reg = None
+	all_targ_reg = None
+	all_diff_reg = None
+	i_major = 0
+	with torch.no_grad():
+		for data, display_image, target in dataloader:
+			if args.cuda:
+				data, target = data.cuda(), target.cuda()
+			data = data.to(args.device)
+			target = target.to(args.device)
+			output = net(data)
+			loss = loss_func(output, target/(360/args.nClasses))
+			pred = output.data.max(1)[1] # get the index of the max log-probability
+			err = torch.mean(abs(pred.float() - (target/(360/args.nClasses)).float()))
+			test_loss += loss
+
+
+			data = [transforms.ToPILImage()(image.cpu()*255) for image in data]	
+			data = [transforms.functional.affine(image,-angle*(360//args.nClasses),(0,0),1,0) for image,angle in zip(data,pred)]
+			data = torch.stack([transforms.ToTensor()(image).cuda() for image in data])/255
+			
+			b=360/args.nClasses # 45
+			# print()
+			# print('target angle:',target.data)
+			# print('target/b:',(target/b).data)
+			# print('pred*b:',pred.data,b)
+			targ = (target/(360/args.nClasses)).cpu().numpy()
+			
+			target -= pred*(360/args.nClasses)
+			# print('target - pred*b:',target.data)
+			# print()
+			torch.where(target<0,360-target,target)
+
+			output_reg = net_reg(data)
+			loss_reg = loss_func_reg(output_reg.float(), target.float(), args)
+			test_loss_reg += loss_reg
+			# pred_reg = output_reg.data.squeeze() # doesnt work with batch size 1
+			if(args.separate_trig):
+				pred_reg = separate_trig_to_angle(output_reg, args)
+				err_reg = torch.mean(abs(output_reg.float() - angle_to_separate_trig(target.float(), args)))
+			else:
+				err_reg = torch.mean(abs(output_reg.float().squeeze() - target.float()))
+			
+
+						
+			pred = pred.cpu().numpy()
+			pred_reg = pred_reg.cpu().numpy()
+			targ_reg = target.cpu().numpy()
+
+			# print(pred, targ)
+
+
+			if(all_pred is None):
+				all_pred = pred
+				all_targ = targ
+				all_diff = difference(args, pred, targ)
+
+				all_pred_reg = pred_reg
+				all_targ_reg = targ_reg
+				all_diff_reg = difference(args, pred_reg, targ_reg)
+
+
+			else:
+				all_pred = np.hstack((all_pred, pred))
+				all_targ = np.hstack((all_targ, targ))
+				all_diff = np.hstack((all_diff, difference(args, pred, targ)))
+		
+
+				all_pred_reg = np.hstack((all_pred_reg, pred_reg))
+				all_targ_reg = np.hstack((all_targ_reg, targ_reg))
+				all_diff_reg = np.hstack((all_diff_reg, difference(args, pred_reg, targ_reg)))
+		
+			i_major+=args.batchSz
+
+		all_pred = np.where(all_pred>360,all_pred%360,all_pred)
+		all_pred_reg = np.where(all_pred_reg>360,all_pred_reg%360,all_pred_reg)
+
+		test_stats_hierarchy(args, all_pred, all_targ, all_diff, all_pred_reg, all_targ_reg, all_diff_reg)
+
+
+		test_loss /= len(dataloader) # loss function already averages over batch size
+		nTotal = len(dataloader.dataset)
+		incorrect = len(np.where(all_diff>5)[0])
+		err = 100.*incorrect/nTotal
+		print('\nTest set: Class loss: {:.4f}, Reg loss: {}, Class err: {}, Reg err: {} \n'.format(
+			test_loss, test_loss_reg, err, err_reg))
 
 
 def adjust_opt(optAlg, optimizer, epoch):
