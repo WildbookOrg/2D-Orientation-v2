@@ -143,7 +143,7 @@ class Data_turtles():
 			angle = int(angle/int(360/self.args.nClasses))
 
 		
-		if(self.args is not None and self.experiment_type=='test' or self.experiment_type=='example'):
+		if(self.args is not None and (self.experiment_type=='test' or self.experiment_type=='example')):
 			image = rotate_im(image,theta)
 			image = transforms.ToPILImage()(image)
 			image = transforms.Resize((128,128))(image)

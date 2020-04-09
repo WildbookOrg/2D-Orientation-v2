@@ -5,3 +5,14 @@ median: 1.4960746765136719
 max: 358.71622
 
 Test set: Average loss: 0.0013, Error: 79/1271 (6%) > 5 deg
+
+baseline========
+mean: 10.713144133936975
+standard deviation: 24.045370342059254
+median: 4.726898193359375
+max: 349.42337
+class k>5: 586 / 1240
+No handles with labels found to put in legend.
+
+Test set: Average loss: 143.8260, Error: 586/1271 (46%) > 5 deg
+

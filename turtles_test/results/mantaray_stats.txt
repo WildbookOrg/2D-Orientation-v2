@@ -6,3 +6,10 @@ max: 359.4958
 
 Test set: Average loss: 0.0010, Error: 58/1072 (5%) > 5 deg
 
+baseline =====
+mean: 8.671124212558453
+standard deviation: 13.364692898518634
+median: 4.7964019775390625
+max: 352.4515
+class k>5: 500 / 1040
+

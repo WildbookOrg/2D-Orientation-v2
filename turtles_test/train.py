@@ -175,7 +175,7 @@ def example_function_hierarchy(model, model_reg, args):
 		
 		target_reg = target - pred*(360/args.nClasses)
 
-		torch.where(target_reg<0,180+target_reg,target_reg)
+		torch.where(target_reg<0,360-target_reg,target_reg)
 
 		output_reg = model_reg(data).cpu()
 		if(args.separate_trig):
@@ -186,12 +186,12 @@ def example_function_hierarchy(model, model_reg, args):
 		data = torch.stack([transforms.ToTensor()(image).cuda() for image in data])/255
 		grid_reg = utils.make_grid(data.cpu()).permute(1,2,0).numpy()*255
 
-	print(pred.data)
-	print(target/(360/args.nClasses))
-	print()
-	print(output_reg.data)
-	print(target_reg.data)
-	print(target)
+	# print(pred.data)
+	# print(target/(360/args.nClasses))
+	# print()
+	# print(output_reg.data)
+	# print(target_reg.data)
+	# print(target)
 	
 	plt.imshow(grid)
 	plt.axis('off')
@@ -261,8 +261,8 @@ def save_all_figures(model, args):
 
 def get_data_loaders(args):
 	if(args.hierarchy):
-		train_dataset = Data_turtles(dataType = 'train2020', experiment_type='test', args = args)
-		val_dataset = Data_turtles(dataType = 'val2020', experiment_type='test', args = args)
+		train_dataset = Data_turtles(dataType = 'train2020', experiment_type='train', args = args)
+		val_dataset = Data_turtles(dataType = 'val2020', experiment_type='validation', args = args)
 		test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
 	else:
 		train_dataset = Data_turtles(dataType = 'train2020', experiment_type='train', args = args)

@@ -59,17 +59,21 @@ def test_stats(args, all_pred, all_targ, all_diff):
 	# plot confusion matrix plot
 	
 	print("max:",max(all_pred))
+
+	print("class k>5:",len(np.where(all_diff>5)[0]),'/',len(all_diff))
+	# print("reg   k>5:",len(np.where(all_diff_reg>5)[0]),'/',len(all_diff_reg))
+
 	
 
-	# classes = np.arange(0,max(max(all_pred),max(all_targ))+1)
+	classes = np.arange(0,max(max(all_pred),max(all_targ))+1)
 	trig = 'Trig Component ' if args.separate_trig and args.type=='regression' else ''
-	# if(args.type=='classification' and not args.hierarchy):
-	# 	trig = str(args.nClasses)+' '
-	# plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
-	# plt.title(("{} {}Error - ".format(args.type.title(),trig)+str(args.animal).title()))
-	# plt.xlabel("True Label")
-	# plt.ylabel("Predicted Label")
-	# plt.show()
+	if(args.type=='classification' and not args.hierarchy):
+		trig = str(args.nClasses)+' '
+	plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
+	plt.title(("{} {}Error - ".format(args.type.title(),trig)+str(args.animal).title()))
+	plt.xlabel("True Label")
+	plt.ylabel("Predicted Label")
+	plt.show()
 
 	# print(list(all_diff))
 
@@ -152,6 +156,10 @@ def test_stats_hierarchy(args, all_pred, all_targ, all_diff, all_pred_reg, all_t
 	print("median:",np.median(all_diff_reg))
 	print("max:",max(all_pred_reg))
 
+	print("class k>5:",len(np.where(all_diff>5)[0]),'/',len(all_diff))
+	print("reg   k>5:",len(np.where(all_diff_reg>5)[0]),'/',len(all_diff_reg))
+
+
 	# ===============================================
 	# plot confusion matrix plot
 	
@@ -212,6 +220,8 @@ def test_stats_hierarchy(args, all_pred, all_targ, all_diff, all_pred_reg, all_t
 	plt.xlabel('Difference Between Predicted and True Labels')
 	f.text(0.04, 0.5, 'Frequency in Test Set', va='center', rotation='vertical')
 	plt.show()
+
+	
 
 
 

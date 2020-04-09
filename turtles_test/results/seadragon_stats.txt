@@ -1,3 +1,14 @@
+Baseline =====
+mean: 6.642051626576317
+standard deviation: 19.15215818431177
+median: 2.62603759765625
+max: 347.7745
+class k>5: 80 / 360
+No handles with labels found to put in legend.
+
+Test set: Average loss: 50.8545, Error: 80/363 (22%) > 5 deg
+
+
 Regression Pretrained Trig Comp ===================
 mean: 3.7889443957772793
 standard deviation: 5.460150821302271
