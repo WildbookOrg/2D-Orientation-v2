@@ -1,0 +1,3 @@
+datasets/testimages/seadragon1.jpg
+datasets/testimages/seadragon2.jpg
+datasets/testimages/seadragon3.jpg

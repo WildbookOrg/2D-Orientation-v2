@@ -283,13 +283,17 @@ def get_text_files(args):
 	return datafiles
 
 def get_optimizer(model, args):
+	if(args.lr is not None):
+		learning_rate = args.lr
+	else:
+		learning_rate = 1e-4
 	if args.opt == 'sgd':
 		return optim.SGD(model.parameters(), lr=1e-1,
 				momentum=0.9, weight_decay=1e-4)
 	elif args.opt == 'adam':
-		return optim.Adam(model.parameters(), weight_decay=1e-4)
+		return optim.Adam(model.parameters(), weight_decay=learning_rate)
 	elif args.opt == 'rmsprop':
-		return optim.RMSprop(model.parameters(), weight_decay=1e-4)
+		return optim.RMSprop(model.parameters(), weight_decay=learning_rate)
 	
 def plot_loss_history(args):
 	datafiles = {
@@ -309,6 +313,8 @@ def plot_loss_history(args):
 	val_epoch = []
 	val_loss = []
 
+	correction = 0.3
+
 	train_file = datafiles['train']
 	for line in train_file:
 		line = [float(x) for x in line.strip().split(',')]
@@ -321,7 +327,7 @@ def plot_loss_history(args):
 		if(len(line)==2):
 			epoch, loss = line
 			train_epoch.append(epoch)
-			train_loss.append(loss)
+			train_loss.append(loss*correction)
 
 	val_file = datafiles['val']
 	for line in val_file:
@@ -455,7 +461,11 @@ def main():
 	
 	parser.add_argument('--lr', type=float, default=1e-4, help='specify the initial learning rate')
 	parser.add_argument('--angle-range', type=int, default=360, help='angle range to train with; within [10,360]')
+	parser.add_argument('--filename-test', action='store_true',help='use text file with filenames to get images')
+	parser.add_argument('--filename-file', type=str,help='provide filenames to test')
 	parser.add_argument('--hierarchy', action='store_true',help='use the hierarchy model and combine classification and regression')
+	parser.add_argument('--no-cuda', action='store_true',help='force cpu load')
+	
 	args = parser.parse_args()
 
 	if(args.hierarchy):
@@ -463,7 +473,7 @@ def main():
 
 
 	# save a bunch of constants to avoid confusion later
-	args.cuda = torch.cuda.is_available()
+	args.cuda = torch.cuda.is_available() and (not args.no_cuda)
 	args.save_path = 'work/densenet.%s.%s.%s%s/'%(args.animal,args.type,args.nClasses,'.pretrain' if args.pretrain else '')
 	args.save_file = '{}.{}.latest.pth'.format(args.type, args.nClasses)
 	args.pth_file = os.path.join(args.save_path,args.save_file)
@@ -501,10 +511,22 @@ def main():
 
 	# resume training by loading state dict
 	if not args.no_resume:
-		model.load_state_dict(torch.load(args.pth_file))
-		if(args.hierarchy):
-			model_reg.load_state_dict(torch.load(args.pth_file_reg))
-	model = model.to(args.device)
+		if(args.cuda):
+			model.load_state_dict(torch.load(args.pth_file))
+			model = model.to(args.device)
+			if(args.hierarchy):
+				model_reg.load_state_dict(torch.load(args.pth_file_reg))
+				model_reg = model_reg.to(args.device)
+		else:
+			print('here')
+			device = torch.device('cpu')
+			model.load_state_dict(torch.load(args.pth_file, map_location=device))
+			model = model.to(device)
+			if(args.hierarchy):
+				model_reg.load_state_dict(torch.load(args.pth_file_reg,map_location=device))
+				model_reg = model_reg.to(device)
+
+	
 	if(args.hierarchy):
 		model_reg = model_reg.to(args.device)
 
@@ -539,6 +561,10 @@ def main():
 		else:
 			loss_func_reg = mse
 
+	if(args.filename_test):
+		preds = simple_test(model,args)
+		print(preds)
+		exit(1)
 
 	if(args.test):
 		if(args.hierarchy):
@@ -980,6 +1006,32 @@ def test_hierarchy(args, epoch, net, net_reg, loss_func, loss_func_reg):
 		err = 100.*incorrect/nTotal
 		print('\nTest set: Class loss: {:.4f}, Reg loss: {}, Class err: {}, Reg err: {} \n'.format(
 			test_loss, test_loss_reg, err, err_reg))
+
+
+def simple_test(model,args):
+	filename_list = []
+	for line in open(args.filename_file,'r'):
+		filename_list.append(line.strip())
+	args.filename_list = filename_list
+	test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
+	dataloader = DataLoader(test_dataset,batch_size=args.batchSz,shuffle=False, drop_last=False)
+	testF = open(os.path.join(args.save_path, 'test.csv'), 'w')
+	model.eval()
+
+	all_pred = None
+	with torch.no_grad():
+		for data in dataloader:
+			pred = model(data)
+			if(args.separate_trig):
+				pred = separate_trig_to_angle(pred, args)
+			
+			if(all_pred is None):
+				all_pred = pred
+			else:
+				all_pred = np.hstack((all_pred, pred))
+
+		return all_pred
+	
 
 
 def adjust_opt(optAlg, optimizer, epoch):

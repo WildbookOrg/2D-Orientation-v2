@@ -9,7 +9,8 @@ def get_angle(args):
 		if(angle<0):
 			angle=360+angle
 	else:
-		angle = int(np.random.uniform(0,360,1))
+		angle = int(np.random.normal(0,100,1))
+		angle = angle if(angle>0) else 360-angle
 	return angle
 
 
@@ -32,7 +33,11 @@ def rgb2gray(rgb):
 class Data_turtles():
 	def __init__(self, dataDir = None, dataType='train2020',
 					experiment_type = '', args = None):
-		
+		if(args.filename_test):
+			self.data = args.filename_list
+			self.args = args
+			return
+
 		if(dataDir == None):
 			self.dataDir = '../datasets/{}/orientation.{}.coco'.format(args.animal,args.animal)
 		else:
@@ -65,6 +70,19 @@ class Data_turtles():
 		return len(self.data)
 
 	def __getitem__(self, index):
+		if(self.args is not None and self.args.filename_test):
+			filename = self.data[index]
+			print(filename)
+			image = io.imread('../'+filename,False)
+
+			# plt.imshow(image)
+			# plt.show()
+
+			I = transforms.ToPILImage()(image)
+			I = transforms.Resize((128,128))(I)
+			I = transforms.ToTensor()(I)
+
+			return I/255
 		# preprocess all images
 		image, poly, theta = self.data[index]
 		# process as each image is loaded
@@ -89,54 +107,85 @@ class Data_turtles():
 
 		mer = self.MER(poly,*image.shape[:2])
 		I = rotate_im(image,theta)
-		# poly_rot = rotate_box(poly,theta,cx,cy,h,w).reshape((4,2))
-		# frame_rot = np.round(rotate_box(frame,theta,cx,cy,h,w).reshape((4,2)))
 		mer_rot = np.round(rotate_box(mer,theta,cx,cy,h,w).reshape((4,2)))
 		mir = self.MIR(theta*np.pi/180, mer[2,1]-mer[0,1], mer[1,0]-mer[0,0], self.MER(mer_rot, *I.shape[:2]))
-		# mir = self.MIR(theta*np.pi/180, h, w, self.MER(mer_rot, *I_rot.shape[:2]))
 		I = I[mir[0,1]:mir[2,1],mir[0,0]:mir[2,0]]
 
 		# show the stages of cropping the image
-		if( self.args is not None and self.args.show):
+		# if( self.args is not None and self.args.show):
 			# =============================================
 			# original image
-			self.ax = plt.gca()
-			# self.show_annotation(poly)
-			# self.show_MER(mer)
-			plt.axis('off')
-			plt.imshow(image)
-			plt.show()
+			
+			# print(poly)
+			# self.ax = plt.gca()
+			# self.show_annotation(frame)
+			# # self.show_MER(mer)
+			# plt.axis('off')
+			# plt.imshow(image)
+			# plt.show()
 			# =============================================
 			# rotated image
-			I_rot = rotate_im(image,theta)
+
+			# I_rot = rotate_im(image,theta)
+			# frame_rot = np.round(rotate_box(frame,theta,cx,cy,h,w).reshape((4,2)))
+			# frame_rot_mir = self.MIR(theta*np.pi/180,h,w,frame)
 			# self.ax = plt.gca()
-			# self.show_MER(mer_rot)
-			# self.show_annotation(mir)
+			# self.show_MER(frame_rot)
+			# self.show_MER(frame_rot_mir)
 			# plt.imshow(I_rot)
 			# plt.show()
-			# # =============================================
-			# # final cropped image
-			# I_cropped = I_rot[mir[0,1]:mir[2,1],mir[0,0]:mir[2,0]]
-			# plt.imshow(I_cropped)
+			# # # =============================================
+			# # augment image
+			
+			# I_aug = rotate_im(I_rot,angle)
+			# frame_aug = np.round(rotate_box(frame_rot,angle,cx,cy,h,w).reshape((4,2)))
+			# frame_aug_mir = self.MIR((angle+theta)*np.pi/180,h,w,frame)
+			# self.ax = plt.gca()
+			# self.show_MER(frame_aug)
+			# self.show_MER(frame_aug_mir)
+			# plt.imshow(I_aug)
 			# plt.show()
 
+			
+		# ==============================================
+		# augment image
+		I_rot = rotate_im(image,angle)
+		frame_rot = np.round(rotate_box(frame,angle,cx,cy,h,w).reshape((4,2)))
+		frame_rot_mir = self.MIR(angle*np.pi/180,h,w,frame)
+		a = -(theta-angle)
+		I_crop = I_rot[frame_rot_mir[0,1]:frame_rot_mir[2,1],frame_rot_mir[0,0]:frame_rot_mir[2,0]]
 
+		if(self.args is not None and self.args.show):
+			# show augmented image
+			self.ax = plt.gca()
+			self.show_MER(frame_rot)
+			self.show_MER(frame_rot_mir)
 			plt.imshow(I_rot)
-			plt.axis('off')
 			plt.show()
-			# ==============================================
+
+			# # orient image 
+			I_cor = rotate_im(I_rot,a)
+			plt.imshow(I_cor)
+			plt.show()
+
+			# show cropped image
+			plt.imshow(I_crop)
+			plt.show()
 
 
+	
 
-		I = transforms.ToPILImage()(I)
+
+		I = transforms.ToPILImage()(I_crop)
 		I = transforms.Resize((resize_to,resize_to))(I)
-		I = transforms.functional.affine(I,angle,(0,0),1,0)
+		# I = transforms.functional.affine(I,angle,(0,0),1,0)
 		# I = transforms.Grayscale()(I)
 		I = transforms.ToTensor()(I)
+
 		
 		image_normalized = I/255#transforms.Normalize(self.means, self.stds)(I)
 		
-		
+
 
 		if(self.args is not None and self.args.type.startswith('classification')):
 			# nCalsses should be a factor of 360
@@ -144,17 +193,17 @@ class Data_turtles():
 
 		
 		if(self.args is not None and (self.experiment_type=='test' or self.experiment_type=='example')):
-			image = rotate_im(image,theta)
+			# image = rotate_im(image,theta)
 			image = transforms.ToPILImage()(image)
-			image = transforms.Resize((128,128))(image)
-			image = transforms.functional.affine(image,angle,(0,0),1,0)
+			image = transforms.Resize((resize_to,resize_to))(image)
+			# image = transforms.functional.affine(image,angle,(0,0),1,0)
 			image = transforms.ToTensor()(image)
 			# plt.imshow(image_normalized.permute(1, 2, 0)*255)
 			# plt.show()
-			return image_normalized, image, angle
+			return image_normalized, image, theta
 
 		# during training 
-		return image_normalized, angle
+		return image_normalized, a
 
 	def MIR(self, angle, im_h, im_w, mer): 
 		

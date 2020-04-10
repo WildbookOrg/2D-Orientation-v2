@@ -1,0 +1,3 @@
+datasets/testimages/mantaray1.jpg
+datasets/testimages/mantaray2.jpg
+datasets/testimages/mantaray3.jpg

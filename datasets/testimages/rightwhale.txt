@@ -1,0 +1,3 @@
+datasets/testimages/rightwhale1.jpg
+datasets/testimages/rightwhale2.jpg
+datasets/testimages/rightwhale3.jpg
