@@ -3,14 +3,16 @@
 
 """
 
-example:
-python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 3 --animal seadragon --example
 
 training:
-srun --time=240 --gres=gpu:1 --ntasks=1 python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 50 --animal seadragon
+srun --time=240 --gres=gpu:1 --ntasks=1 python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 50 --animal seaturtle
 
-loss history
-python3 train.py --type regression --nClasses 2 --separate-trig --pretrain --plot-loss-history --animal seadragon
+test on cpu with filenames:
+python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 1 --animal seadragon --filename-test --filename-file ../datasets/testimages/seaturtle.txt --no-cuda
+
+seaturtle output from filenames test: 
+	[ 70.28217 317.52017 321.556  ]
+	if other values are obtained then the wrong state dict was loaded
 
 """
 
