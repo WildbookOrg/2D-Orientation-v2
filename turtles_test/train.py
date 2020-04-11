@@ -8,10 +8,10 @@ training:
 srun --time=240 --gres=gpu:1 --ntasks=1 python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 50 --animal seaturtle
 
 test on cpu with filenames:
-python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 1 --animal seaturtle --filename-test --filename-file ../datasets/testimages/seaturtle.txt --no-cuda
+python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 1 --pretrain --animal seaturtle --filename-test --filename-file ../datasets/testimages/seaturtle.txt --no-cuda
 
 seaturtle output from filenames test: 
-	[ 70.28217 317.52017 321.556  ]
+	[ 78.06755 310.00012 301.00635]
 	if other values are obtained then the wrong state dict was loaded
 
 """
@@ -520,7 +520,7 @@ def main():
 				model_reg.load_state_dict(torch.load(args.pth_file_reg))
 				model_reg = model_reg.to(args.device)
 		else:
-			print('here')
+			print('loading with cpu')
 			device = torch.device('cpu')
 			model.load_state_dict(torch.load(args.pth_file, map_location=device))
 			model = model.to(device)
@@ -1033,7 +1033,7 @@ def simple_test(model,args):
 				all_pred = np.hstack((all_pred, pred))
 
 		return all_pred
-	
+
 
 
 def adjust_opt(optAlg, optimizer, epoch):
