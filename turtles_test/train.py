@@ -1017,7 +1017,6 @@ def simple_test(model,args):
 	args.filename_list = filename_list
 	test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
 	dataloader = DataLoader(test_dataset,batch_size=args.batchSz,shuffle=False, drop_last=False)
-	testF = open(os.path.join(args.save_path, 'test.csv'), 'w')
 	model.eval()
 
 	all_pred = None

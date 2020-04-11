@@ -75,7 +75,8 @@ class Data_turtles():
 			print(filename)
 			image = io.imread('../'+filename,False)
 
-			# plt.imshow(image)
+			# I_rot = rotate_im(image,-78)
+			# plt.imshow(I_rot)
 			# plt.show()
 
 			I = transforms.ToPILImage()(image)
