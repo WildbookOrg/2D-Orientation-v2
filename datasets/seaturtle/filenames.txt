@@ -1,0 +1,9 @@
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000001.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000018.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000028.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000030.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000036.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000037.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000044.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000051.jpg
+datasets/seaturtle/orientation.seaturtle.coco/images/test2020/000000000056.jpg

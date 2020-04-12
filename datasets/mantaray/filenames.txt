@@ -1,0 +1,9 @@
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000005.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000007.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000009.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000015.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000016.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000018.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000021.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000032.jpg
+datasets/mantaray/orientation.mantaray.coco/images/test2020/000000000044.jpg

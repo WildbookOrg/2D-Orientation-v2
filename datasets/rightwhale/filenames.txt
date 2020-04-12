@@ -1,0 +1,9 @@
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000005.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000007.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000009.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000011.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000017.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000018.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000020.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000022.jpg
+datasets/rightwhale/orientation.rightwhale.coco/images/test2020/000000000025.jpg

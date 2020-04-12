@@ -5,7 +5,7 @@
 
 
 training:
-srun --time=240 --gres=gpu:1 --ntasks=1 python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 50 --animal seaturtle
+srun --time=240 --gres=gpu:1 --ntasks=1 python3 train.py --type regression --nClasses 2 --pretrain --device 0 --separate-trig --batchSz 50 --animal seaturtle
 
 test on cpu with filenames:
 python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 1 --pretrain --animal seaturtle --filename-test --filename-file ../datasets/testimages/seaturtle.txt --no-cuda
@@ -13,6 +13,9 @@ python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --bat
 seaturtle output from filenames test: 
 	[ 78.06755 310.00012 301.00635]
 	if other values are obtained then the wrong state dict was loaded
+
+test on cpu with filenames and display prediction
+python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 1 --pretrain --animal seaturtle --filename-test --filename-file ../datasets/seaturtle/filenames.txt --no-cuda --show
 
 """
 
@@ -564,8 +567,12 @@ def main():
 			loss_func_reg = mse
 
 	if(args.filename_test):
-		preds = simple_test(model,args)
-		print(preds)
+		if(args.show):
+			simple_test_show(model,args)
+		else:
+
+			preds = simple_test(model,args)
+			print(preds)
 		exit(1)
 
 	if(args.test):
@@ -883,6 +890,10 @@ def test(args, epoch, net):
 			predn = pred.cpu().numpy()
 			targn = target.cpu().numpy()
 
+			print(predn)
+			print(targn)
+			print()
+
 			if(all_pred is None):
 				all_pred = predn
 				all_targ = targn
@@ -1033,6 +1044,27 @@ def simple_test(model,args):
 
 		return all_pred
 
+def simple_test_show(model,args):
+	from utils.bbox_util import rotate_im
+	filename_list = []
+	for line in open(args.filename_file,'r'):
+		filename_list.append(line.strip())
+	args.filename_list = filename_list
+	test_dataset = Data_turtles(dataType='test2020', experiment_type='test', args = args)
+	dataloader = DataLoader(test_dataset,batch_size=args.batchSz,shuffle=False, drop_last=False)
+	model.eval()
+
+	all_pred = None
+	with torch.no_grad():
+		for data,image in dataloader:
+			pred = model(data)
+			if(args.separate_trig):
+				pred = separate_trig_to_angle(pred, args)
+			image = image.squeeze()
+			print(image.shape)
+			I = rotate_im(image.numpy(),-pred)
+			plt.imshow(I)
+			plt.show()
 
 
 def adjust_opt(optAlg, optimizer, epoch):

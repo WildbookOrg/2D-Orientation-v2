@@ -83,7 +83,10 @@ class Data_turtles():
 			I = transforms.Resize((128,128))(I)
 			I = transforms.ToTensor()(I)
 
-			return I/255
+			if(self.args.show):
+				return I/255,image
+			else:
+				return I/255
 		# preprocess all images
 		image, poly, theta = self.data[index]
 		# process as each image is loaded
@@ -173,6 +176,11 @@ class Data_turtles():
 			plt.imshow(I_crop)
 			plt.show()
 
+		if(a>360):
+			a = a%360
+		if(a<0):
+			a = 360+a
+
 
 	
 
@@ -201,6 +209,10 @@ class Data_turtles():
 			image = transforms.ToTensor()(image)
 			# plt.imshow(image_normalized.permute(1, 2, 0)*255)
 			# plt.show()
+			if(theta>360):
+				theta=theta%360
+			if(theta<0):
+				theta=360+theta
 			return image_normalized, image, theta
 
 		# during training 

@@ -1,0 +1,9 @@
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000010.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000011.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000024.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000028.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000029.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000030.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000032.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000036.jpg
+datasets/seadragon/orientation.seadragon.coco/images/test2020/000000000047.jpg
