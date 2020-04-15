@@ -27,6 +27,9 @@ register_preproc_annot = controller_inject.register_preprocs['annot']
 ROOT = ibeis.const.ANNOTATION_TABLE
 
 
+INPUT_SIZE = 224
+
+
 MAX_RANK = 12
 FORCE_SERIAL = False
 FORCE_SERIAL = FORCE_SERIAL or 'macosx' in ut.get_plat_specifier().lower()
@@ -136,7 +139,7 @@ def get_marker(index, total):
 @register_ibs_method
 @register_api('/api/plugin/orientation/2d/', methods=['GET'])
 def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
-                                          batch_size=8, multi=False):
+                                          batch_size=128, multi=False):
     r"""
     Run inference with 2D orientation estimation, as developed by Henry Grover
 
@@ -230,7 +233,12 @@ def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
     model.eval()
 
     ibs._parallel_chips = not FORCE_SERIAL
-    filepath_list = ibs.get_annot_chip_fpath(aid_list, ensure=True)
+
+    config2_ = {
+        'resize_dim'   : 'wh',
+        'dim_size'     : (INPUT_SIZE, INPUT_SIZE),
+    }
+    filepath_list = ibs.get_annot_chip_fpath(aid_list, ensure=True, config2_=config2_)
 
     class DummyArgs(object):
         def __init__(self, filepath_list):
@@ -290,7 +298,7 @@ class Orientation2DConfig(dtool.Config):
     coltypes=[float],
     configclass=Orientation2DConfig,
     fname='orientation',
-    chunksize=128,
+    chunksize=1024,
 )
 def ibeis_plugin_orientation_2d_inference_depc(depc, aid_list, config=None):
     r"""
@@ -417,8 +425,7 @@ def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=T
 
     config2_ = {
         'resize_dim'   : 'wh',
-        'dim_size'     : (256, 256),
-        # 'axis_aligned' : True,
+        'dim_size'     : (INPUT_SIZE, INPUT_SIZE),
     }
     # Pre-compute in parallel quickly so they are cached
     ibs.get_annot_chip_fpath(all_aid_list_, ensure=True, config2_=config2_)
@@ -492,11 +499,14 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         desired_notes = [
             'source',
             'aligned',
+            'squared',
             'random-00',
             'random-01',
             'random-02',
+
             'source*',
             'aligned*',
+            'squared*',
             'random-00*',
             'random-01*',
             'random-02*',
