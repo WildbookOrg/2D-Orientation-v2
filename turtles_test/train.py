@@ -8,7 +8,7 @@ training:
 srun --time=240 --gres=gpu:1 --ntasks=1 python3 train.py --type regression --nClasses 2 --pretrain --device 0 --separate-trig --batchSz 50 --animal seaturtle
 
 test on cpu with filenames:
-python3 train.py --type regression --nClasses 2 --separate-trig --batchSz 1 --no-resume --pretrain --animal seaturtle --filename-test --filename-file ../datasets/testimages/seaturtle.txt --no-cuda
+python3 train.py --type regression --nClasses 2 --device 0 --separate-trig --batchSz 1 --pretrain --animal seaturtle --filename-test --filename-file ../datasets/testimages/seaturtle.txt --no-cuda
 
 seaturtle output from filenames test:
     [ 78.06755 310.00012 301.00635]
@@ -41,10 +41,10 @@ import sys
 import math
 import shutil
 
-from utils.test import *
+from .utils.test import *
 
 # imort data loader for both mnist and turtles
-from data import *
+from .data import *
 
 import matplotlib.pyplot as plt
 # plt.switch_backend('tkagg')
@@ -460,7 +460,7 @@ def main():
     parser.add_argument('--pretrain', action='store_true', help='used with --no-resume, load wiped network with densenet pretrained values')
     parser.add_argument('--separate-trig', action='store_true', help='use the trig components (sin,cos) to estimate rotation, rather than theta')
     parser.add_argument('--degree-loss', action='store_true',help='estimate orientation using sin cos components')
-    parser.add_argument('--device', type=int, default=None, choices=tuple([None] + list(range(torch.cuda.device_count()))), help='specify the cuda device to run on')
+    parser.add_argument('--device', type=int, default=0, choices=tuple(range(torch.cuda.device_count())), help='specify the cuda device to run on')
     parser.add_argument('--save-all-figs', action='store_true', help='apply the example function to each test image and save in a directory') # TODO
     parser.add_argument('--animal', type=str, default='seaturtle',
                             choices=('seaturtle', 'turtles1','seadragon','mantaray','rightwhale'))
