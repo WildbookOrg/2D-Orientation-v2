@@ -514,6 +514,8 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         'HS' : {},
     }
 
+    aid_dict = {}
+
     for desired_note in desired_notes:
         aid_list = ibs.get_valid_aids()
 
@@ -601,6 +603,10 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
                 # label = query_config_label
                 label = '%s %s' % (query_config_label, desired_note, )
 
+                if label not in aid_dict:
+                    aid_dict[label] = []
+                aid_dict[label].append(qaid)
+
                 if label not in rank_dict:
                     rank_dict[label] = {
                         'annots': {},
@@ -622,8 +628,8 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
                     rank_dict[label]['annots'][qaid] = annot_ranks
                     rank_dict[label]['names'][qaid] = name_ranks
 
-            if qindex % 10 == 0:
-                ut.save_cPkl(rank_dict_filepath, rank_dict)
+            # if qindex % 10 == 0:
+            #     ut.save_cPkl(rank_dict_filepath, rank_dict)
 
         ut.save_cPkl(rank_dict_filepath, rank_dict)
 
@@ -636,12 +642,12 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
         annot_ranks_ = {}
         for qaid in annot_ranks:
-            if qaid in aid_list:
+            if qaid in aid_dict[label]:
                 annot_ranks_[qaid] = annot_ranks[qaid]
 
         name_ranks_ = {}
         for qaid in name_ranks:
-            if qaid in aid_list:
+            if qaid in aid_dict[label]:
                 name_ranks_[qaid] = name_ranks[qaid]
 
         rank_dict_[label] = {
@@ -662,7 +668,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
                 continue
             if desired_note == 'source':
                 source_list.append(label)
-            if desired_note.endswith('*'):
+            elif desired_note.endswith('*'):
                 label_ = label.strip('*')
                 if label_ in rank_label_list:
                     matched_list.append(label)
