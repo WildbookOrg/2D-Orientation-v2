@@ -125,7 +125,7 @@ def rank_min_avg(rank_dict, max_rank):
 def get_marker(index, total):
     marker_list = ['o', 'X', '+', '*']
     num_markers = len(marker_list)
-    if total <= 4:
+    if total <= 12:
         index_ = 0
     else:
         index_ = index % num_markers
@@ -190,7 +190,7 @@ def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
             device = 'cuda:0'
         else:
             device = 'cpu'
-    device = torch.device('cpu')
+    device = torch.device(device)
 
     # Download the model from the Azure CDN, if model_tag is recognized
     model_url = URL_DICT.get(model_tag, None)
@@ -490,16 +490,16 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     """
     if desired_notes is None:
         desired_notes = [
-            'source',
-            'aligned',
+            # 'source',
+            # 'aligned',
             'random-00',
-            'random-01',
-            'random-02',
-            'source*',
-            'aligned*',
+            # 'random-01',
+            # 'random-02',
+            # 'source*',
+            # 'aligned*',
             'random-00*',
-            'random-01*',
-            'random-02*',
+            # 'random-01*',
+            # 'random-02*',
         ]
 
     # Load any pre-computed ranks
@@ -528,6 +528,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         aid_list = ut.compress(aid_list, flag_list)
 
         if desired_note.endswith('*'):
+
             model_tag = SPECIES_MODEL_TAG_MAPPING.get(desired_species, None)
             assert model_tag is not None
             config = {
@@ -627,8 +628,58 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     fig_ = plt.figure(figsize=(20, 10), dpi=300)  # NOQA
 
+    rank_label_list = list(rank_dict.keys())
+
+    source_list, original_list, matched_list, unmatched_list = [], [], [], []
+    label_list = []
+    for desired_note in desired_notes:
+        for query_config_label in query_config_dict_dict:
+            label = '%s %s' % (query_config_label, desired_note, )
+            if label not in rank_label_list:
+                continue
+            if desired_note == 'source':
+                source_list.append(label)
+            if desired_note.endswith('*'):
+                label_ = label.strip('*')
+                if label_ in rank_label_list:
+                    matched_list.append(label)
+                else:
+                    unmatched_list.append(label)
+            else:
+                original_list.append(label)
+            label_list.append(label)
+
+    assert len(source_list) <= 1
+    color_label_list = original_list + unmatched_list
+    color_list = pt.distinct_colors(len(color_label_list), randomize=False)
+
+    color_dict = {}
+    line_dict = {}
+
+    for label in source_list:
+        color_dict[label] = (0.0, 0.0, 0.0)
+        line_dict[label] = '-'
+
+    for label, color in zip(color_label_list, color_list):
+        color_dict[label] = color
+        if label in unmatched_list:
+            line_dict[label] = '--'
+        else:
+            line_dict[label] = '-'
+
+    for label in matched_list:
+        label_ = label.strip('*')
+        color = color_dict.get(label_, None)
+        assert color is not None
+        color_dict[label] = color
+        line_dict[label] = '--'
+
+    color_list = ut.take(color_dict, label_list)
+    line_list = ut.take(line_dict, label_list)
+    assert None not in color_list and None not in line_list
+
     values_list = []
-    for label in rank_dict:
+    for label in label_list:
         annot_ranks = rank_dict[label]['annots']
         min_vals,   avg_vals   = rank_min_avg(annot_ranks, MAX_RANK)
         min_x_list, min_y_list = min_vals
@@ -641,9 +692,6 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
             )
         )
 
-    color_list = [(0.0, 0.0, 0.0)]
-    color_list += pt.distinct_colors(len(values_list), randomize=False)
-
     axes_ = plt.subplot(121)
     axes_.set_autoscalex_on(False)
     axes_.set_autoscaley_on(False)
@@ -651,19 +699,20 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     axes_.set_xlabel('Rank')
     axes_.set_xlim([1.0, MAX_RANK])
     axes_.set_ylim([0.0, 1.0])
-    zipped = list(zip(color_list, values_list))
+    zipped = list(zip(color_list, line_list, values_list))
     total = len(zipped)
-    for index, (color, values) in enumerate(zipped):
+    for index, (color, linestyle, values) in enumerate(zipped):
         label, x_list, y_list = values
         marker = get_marker(index, total)
-        plt.plot(x_list, y_list, color=color, marker=marker, label=label, alpha=1.0)
+        plt.plot(x_list, y_list, color=color, marker=marker, label=label,
+                 linestyle=linestyle, alpha=1.0)
 
     plt.title('One-to-Many Annotations - Cumulative Match Rank')
     plt.legend(bbox_to_anchor=(0.0, 1.04, 1.0, .102), loc=3, ncol=2, mode="expand",
                borderaxespad=0.0)
 
     values_list = []
-    for label in rank_dict:
+    for label in label_list:
         name_ranks = rank_dict[label]['names']
         min_vals,   avg_vals   = rank_min_avg(name_ranks, MAX_RANK)
         min_x_list, min_y_list = min_vals
@@ -675,9 +724,6 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
             )
         )
 
-    color_list = [(0.0, 0.0, 0.0)]
-    color_list += pt.distinct_colors(len(values_list), randomize=False)
-
     axes_ = plt.subplot(122)
     axes_.set_autoscalex_on(False)
     axes_.set_autoscaley_on(False)
@@ -685,12 +731,13 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     axes_.set_xlabel('Rank')
     axes_.set_xlim([1.0, MAX_RANK])
     axes_.set_ylim([0.0, 1.0])
-    zipped = list(zip(color_list, values_list))
+    zipped = list(zip(color_list, line_list, values_list))
     total = len(zipped)
-    for index, (color, values) in enumerate(zipped):
+    for index, (color, linestyle, values) in enumerate(zipped):
         label, x_list, y_list = values
         marker = get_marker(index, total)
-        plt.plot(x_list, y_list, color=color, marker=marker, label=label, alpha=1.0)
+        plt.plot(x_list, y_list, color=color, marker=marker, label=label,
+                 linestyle=linestyle, alpha=1.0)
 
     plt.title('One-to-Many Names - Cumulative Match Rank')
     plt.legend(bbox_to_anchor=(0.0, 1.04, 1.0, .102), loc=3, ncol=2, mode="expand",
