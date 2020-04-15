@@ -491,11 +491,15 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     if desired_notes is None:
         desired_notes = [
             'source',
-            # 'source*',
             'aligned',
-            # 'aligned*',
             'random-00',
+            'random-01',
+            'random-02',
+            'source*',
+            'aligned*',
             'random-00*',
+            'random-01*',
+            'random-02*',
         ]
 
     # Load any pre-computed ranks
