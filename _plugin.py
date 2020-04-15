@@ -546,7 +546,6 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
             delete_note_flag_list = existing_note_list == desired_note
             delete_flag_list = delete_species_flag_list & delete_note_flag_list
             delete_aid_list = ut.compress(all_aid_list, delete_flag_list)
-            ibs.delete_annots(delete_aid_list)
 
             gid_list       = ibs.get_annot_gids(aid_list)
             bbox_list      = ibs.get_annot_bboxes(aid_list)
@@ -571,6 +570,10 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
                 name_list=name_list,
                 notes_list=note_list
             )
+
+            delete_aid_list = list(set(delete_aid_list) - set(aid_list_))
+            ibs.delete_annots(delete_aid_list)
+
             aid_list = aid_list_
 
         nid_list = ibs.get_annot_nids(aid_list)
