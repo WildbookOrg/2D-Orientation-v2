@@ -136,7 +136,7 @@ def get_marker(index, total):
 @register_ibs_method
 @register_api('/api/plugin/orientation/2d/', methods=['GET'])
 def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
-                                          batch_size=8, multi=True):
+                                          batch_size=8, multi=False):
     r"""
     Run inference with 2D orientation estimation, as developed by Henry Grover
 
