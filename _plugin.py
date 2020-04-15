@@ -629,9 +629,29 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     #####
 
+    rank_dict_ = {}
+    for label in rank_dict:
+        annot_ranks = rank_dict[label]['annots']
+        name_ranks = rank_dict[label]['names']
+
+        annot_ranks_ = {}
+        for qaid in annot_ranks:
+            if qaid in aid_list:
+                annot_ranks_[qaid] = annot_ranks[qaid]
+
+        name_ranks_ = {}
+        for qaid in name_ranks:
+            if qaid in aid_list:
+                name_ranks_[qaid] = name_ranks[qaid]
+
+        rank_dict_[label] = {
+            'annots' : annot_ranks_,
+            'names'  : name_ranks_,
+        }
+
     fig_ = plt.figure(figsize=(20, 10), dpi=300)  # NOQA
 
-    rank_label_list = list(rank_dict.keys())
+    rank_label_list = list(rank_dict_.keys())
 
     source_list, original_list, matched_list, unmatched_list = [], [], [], []
     label_list = []
@@ -683,7 +703,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     values_list = []
     for label in label_list:
-        annot_ranks = rank_dict[label]['annots']
+        annot_ranks = rank_dict_[label]['annots']
         min_vals,   avg_vals   = rank_min_avg(annot_ranks, MAX_RANK)
         min_x_list, min_y_list = min_vals
         # avg_x_list, avg_y_list = avg_vals
@@ -716,7 +736,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     values_list = []
     for label in label_list:
-        name_ranks = rank_dict[label]['names']
+        name_ranks = rank_dict_[label]['names']
         min_vals,   avg_vals   = rank_min_avg(name_ranks, MAX_RANK)
         min_x_list, min_y_list = min_vals
         values_list.append(
