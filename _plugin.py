@@ -167,7 +167,7 @@ def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
         >>> note_list = ibs.get_annot_notes(aid_list)
         >>> species_list = ibs.get_annot_species(aid_list)
         >>> flag_list = [
-        >>>     note == 'random-00' and species == 'manta_ray_giant'
+        >>>     note == 'random-01' and species == 'manta_ray_giant'
         >>>     for note, species in zip(note_list, species_list)
         >>> ]
         >>> aid_list = ut.compress(aid_list, flag_list)
@@ -325,7 +325,7 @@ def ibeis_plugin_orientation_2d_inference_depc(depc, aid_list, config=None):
         >>> note_list = ibs.get_annot_notes(aid_list)
         >>> species_list = ibs.get_annot_species(aid_list)
         >>> flag_list = [
-        >>>     note == 'random-00' and species == 'manta_ray_giant'
+        >>>     note == 'random-01' and species == 'manta_ray_giant'
         >>>     for note, species in zip(note_list, species_list)
         >>> ]
         >>> aid_list = ut.compress(aid_list, flag_list)
@@ -355,7 +355,7 @@ def ibeis_plugin_orientation_2d_inference_depc(depc, aid_list, config=None):
 
 @register_ibs_method
 def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=True,
-                                                desired_note='random-00', **kwargs):
+                                                desired_note='random-01', **kwargs):
     r"""
     Show examples of the prediction for each species
 
@@ -500,16 +500,16 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
             'source',
             'aligned',
             'squared',
-            'random-00',
             'random-01',
-            'random-02',
+            'random-01',
+            'random-03',
 
             'source*',
             'aligned*',
             'squared*',
-            'random-00*',
             'random-01*',
-            'random-02*',
+            'random-01*',
+            'random-03*',
         ]
 
     # Load any pre-computed ranks
@@ -527,6 +527,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     aid_dict = {}
 
     for desired_note in desired_notes:
+        print('Processing %s' % (desired_note, ))
         aid_list = ibs.get_valid_aids()
 
         note_list = ibs.get_annot_notes(aid_list)
