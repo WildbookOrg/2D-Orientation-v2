@@ -183,7 +183,7 @@ def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
         >>> degree_list = ibs.ibeis_plugin_orientation_2d_inference(aid_list, model_tag)
         >>> result = degree_list
         >>> print(result)
-        [101.2, 145.93, 86.38, 112.2, 60.96]
+        [98.54, 31.31, 129.91, 191.62, 43.99]
     """
     from ibeis_2d_orientation.turtles_test.train import separate_trig_to_angle
     from ibeis_2d_orientation.turtles_test.data import Data_turtles
@@ -253,8 +253,7 @@ def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
             self.show          = False
 
     args = DummyArgs(filepath_list)
-    dataset = Data_turtles(dataType='test2020', experiment_type='test', args=args,
-                           add_pad=True)
+    dataset = Data_turtles(dataType='test2020', experiment_type='test', args=args)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False,
                             drop_last=False, num_workers=0, pin_memory=using_gpu)
 
@@ -343,7 +342,7 @@ def ibeis_plugin_orientation_2d_inference_depc(depc, aid_list, config=None):
         >>> degree_list = ibs.depc_annot.get('orientation_two_dimension', aid_list, 'degree', config=config)
         >>> result = degree_list
         >>> print(result)
-        [101.2, 145.93, 86.38, 112.2, 60.96]
+        [98.54, 31.31, 129.91, 191.62, 43.99]
     """
     ibs = depc.controller
 
