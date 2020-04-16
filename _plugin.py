@@ -27,7 +27,7 @@ register_preproc_annot = controller_inject.register_preprocs['annot']
 ROOT = ibeis.const.ANNOTATION_TABLE
 
 
-INPUT_SIZE = 224
+INPUT_SIZE = 224 * 2
 
 
 MAX_RANK = 12
@@ -423,8 +423,8 @@ def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=T
     key_list = list(result_dict.keys())
 
     slots = (len(key_list), num_examples, )
-    figsize = (10 * slots[1], 10 * slots[0], )
-    fig_ = plt.figure(figsize=figsize, dpi=300)  # NOQA
+    figsize = (8 * slots[1], 5 * slots[0], )
+    fig_ = plt.figure(figsize=figsize, dpi=200)  # NOQA
     plt.grid(None)
 
     config2_ = {
