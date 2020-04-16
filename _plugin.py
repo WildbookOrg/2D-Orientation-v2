@@ -492,7 +492,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         >>> ibs = ibeis.opendb(dbdir=dbdir)
         >>> species_list = [
         >>>     'right_whale_head',
-        >>>     'turtle_hawksbill+head'
+        >>>     'turtle_hawksbill+head',
         >>>     'seadragon_weedy+head',
         >>>     'manta_ray_giant',
         >>> ]
@@ -653,17 +653,21 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     rank_dict_ = {}
     for label in rank_dict:
+        qaid_list = aid_dict.get(label, None)
+        if qaid_list is None:
+            continue
+
         annot_ranks = rank_dict[label]['annots']
         name_ranks = rank_dict[label]['names']
 
         annot_ranks_ = {}
         for qaid in annot_ranks:
-            if qaid in aid_dict[label]:
+            if qaid in qaid_list:
                 annot_ranks_[qaid] = annot_ranks[qaid]
 
         name_ranks_ = {}
         for qaid in name_ranks:
-            if qaid in aid_dict[label]:
+            if qaid in qaid_list:
                 name_ranks_[qaid] = name_ranks[qaid]
 
         rank_dict_[label] = {
@@ -673,15 +677,42 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     fig_ = plt.figure(figsize=(20, 10), dpi=300)  # NOQA
 
+    AVERAGE_RANDOM = True
+
     rank_label_list = list(rank_dict_.keys())
+
+    rank_label_mapping = {}
+    if AVERAGE_RANDOM:
+        rank_label_list_ = []
+        for rank_label in rank_label_list:
+            if 'random' in rank_label:
+                rank_label_ = rank_label.split('-')
+                rank_label_ = rank_label_[:-1]
+                rank_label_ = '-'.join(rank_label_)
+                if rank_label.endswith('*'):
+                    rank_label_ = '%s*' % (rank_label_, )
+
+                rank_label_mapping[rank_label] = rank_label_
+                if rank_label_ not in rank_label_list_:
+                    rank_label_list_.append(rank_label_)
+            else:
+                rank_label_list_.append(rank_label)
+        rank_label_list = rank_label_list_
 
     source_list, original_list, matched_list, unmatched_list = [], [], [], []
     label_list = []
     for desired_note in desired_notes:
         for query_config_label in query_config_dict_dict:
             label = '%s %s' % (query_config_label, desired_note, )
+
+            label = rank_label_mapping.get(label, label)
+
             if label not in rank_label_list:
                 continue
+
+            if label in label_list:
+                continue
+
             if desired_note == 'source':
                 source_list.append(label)
             elif desired_note.endswith('*'):
@@ -723,19 +754,50 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     line_list = ut.take(line_dict, label_list)
     assert None not in color_list and None not in line_list
 
+    rank_value_dict = {}
+    rank_label_list = list(rank_dict_.keys())
+    for label in rank_label_list:
+        label_ = rank_label_mapping.get(label, label)
+        if label_ not in rank_value_dict:
+            rank_value_dict[label_] = {
+                'a': {
+                    'x': [],
+                    'y': [],
+                },
+                'b': {
+                    'x': [],
+                    'y': [],
+                },
+            }
+
+        # Plot 1
+        annot_ranks = rank_dict_[label]['annots']
+        min_vals, avg_vals = rank_min_avg(annot_ranks, MAX_RANK)
+        x_list, y_list = min_vals
+        # x_list, y_list = avg_vals
+        rank_value_dict[label_]['a']['x'].append(x_list)
+        rank_value_dict[label_]['a']['y'].append(y_list)
+
+        # Plot 2
+        name_ranks = rank_dict_[label]['names']
+        min_vals, avg_vals = rank_min_avg(name_ranks, MAX_RANK)
+        x_list, y_list = min_vals
+        # x_list, y_list = avg_vals
+        rank_value_dict[label_]['b']['x'].append(x_list)
+        rank_value_dict[label_]['b']['y'].append(y_list)
+
+    for label in rank_value_dict:
+        rank_value_dict[label]['a']['x'] = np.mean(rank_value_dict[label]['a']['x'], axis=0)
+        rank_value_dict[label]['a']['y'] = np.mean(rank_value_dict[label]['a']['y'], axis=0)
+        rank_value_dict[label]['b']['x'] = np.mean(rank_value_dict[label]['b']['x'], axis=0)
+        rank_value_dict[label]['b']['y'] = np.mean(rank_value_dict[label]['b']['y'], axis=0)
+
     values_list = []
     for label in label_list:
-        annot_ranks = rank_dict_[label]['annots']
-        min_vals,   avg_vals   = rank_min_avg(annot_ranks, MAX_RANK)
-        min_x_list, min_y_list = min_vals
-        # avg_x_list, avg_y_list = avg_vals
-        values_list.append(
-            (
-                label,
-                min_x_list,
-                min_y_list,
-            )
-        )
+        x_list = rank_value_dict[label]['a']['x']
+        y_list = rank_value_dict[label]['a']['y']
+        values = (label, x_list, y_list, )
+        values_list.append(values)
 
     axes_ = plt.subplot(121)
     axes_.set_autoscalex_on(False)
@@ -758,16 +820,10 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
     values_list = []
     for label in label_list:
-        name_ranks = rank_dict_[label]['names']
-        min_vals,   avg_vals   = rank_min_avg(name_ranks, MAX_RANK)
-        min_x_list, min_y_list = min_vals
-        values_list.append(
-            (
-                label,
-                min_x_list,
-                min_y_list,
-            )
-        )
+        x_list = rank_value_dict[label]['b']['x']
+        y_list = rank_value_dict[label]['b']['y']
+        values = (label, x_list, y_list, )
+        values_list.append(values)
 
     axes_ = plt.subplot(122)
     axes_.set_autoscalex_on(False)
@@ -788,7 +844,11 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
     plt.legend(bbox_to_anchor=(0.0, 1.04, 1.0, .102), loc=3, ncol=2, mode="expand",
                borderaxespad=0.0)
 
-    note_str = '_'.join(desired_notes)
+    label_list_ = [
+        val.lower().replace(' ', '_')
+        for val in label_list
+    ]
+    note_str = '_'.join(label_list_)
     args = (desired_species, note_str, )
     fig_filename = 'orientation.2d.matching.hotspotter.%s.%s.png' % args
     fig_path = abspath(expanduser(join('~', 'Desktop')))
