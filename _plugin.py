@@ -420,7 +420,7 @@ def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=T
 
     slots = (len(key_list), num_examples, )
     figsize = (10 * slots[1], 10 * slots[0], )
-    fig_ = plt.figure(figsize=figsize, dpi=150)  # NOQA
+    fig_ = plt.figure(figsize=figsize, dpi=300)  # NOQA
     plt.grid(None)
 
     config2_ = {
