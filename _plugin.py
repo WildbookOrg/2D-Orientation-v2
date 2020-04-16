@@ -54,14 +54,19 @@ URL_DICT = {
     'rightwhale_v1' : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.right_whale.v1.pth',
     'seadragon_v1'  : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.sea_dragon.v1.pth',
     'seaturtle_v1'  : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.sea_turtle.v1.pth',
+
+    'mantaray_v2'   : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.manta.v2.pth',
+    'rightwhale_v2' : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.right_whale.v2.pth',
+    'seadragon_v2'  : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.sea_dragon.v2.pth',
+    'seaturtle_v2'  : 'https://wildbookiarepository.azureedge.net/models/orientation.2d.sea_turtle.v2.pth',
 }
 
 
 SPECIES_MODEL_TAG_MAPPING = {
-    'manta_ray_giant'       : 'mantaray_v1',
-    'right_whale_head'      : 'rightwhale_v1',
-    'seadragon_weedy+head'  : 'seadragon_v1',
-    'turtle_hawksbill+head' : 'seaturtle_v1',
+    'manta_ray_giant'       : 'mantaray_v2',
+    'right_whale_head'      : 'rightwhale_v2',
+    'seadragon_weedy+head'  : 'seadragon_v2',
+    'turtle_hawksbill+head' : 'seaturtle_v2',
 }
 
 
@@ -174,7 +179,7 @@ def ibeis_plugin_orientation_2d_inference(ibs, aid_list, model_tag, device=None,
         >>> random.seed(1)
         >>> random.shuffle(aid_list)
         >>> aid_list = aid_list[:5]
-        >>> model_tag = 'mantaray_v1'
+        >>> model_tag = 'mantaray_v2'
         >>> degree_list = ibs.ibeis_plugin_orientation_2d_inference(aid_list, model_tag)
         >>> result = degree_list
         >>> print(result)
@@ -333,7 +338,7 @@ def ibeis_plugin_orientation_2d_inference_depc(depc, aid_list, config=None):
         >>> random.shuffle(aid_list)
         >>> aid_list = aid_list[:5]
         >>> config = {
-        >>>     'orientation_2d_model_tag': 'mantaray_v1',
+        >>>     'orientation_2d_model_tag': 'mantaray_v2',
         >>> }
         >>> degree_list = ibs.depc_annot.get('orientation_two_dimension', aid_list, 'degree', config=config)
         >>> result = degree_list
@@ -499,14 +504,14 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         desired_notes = [
             'source',
             'aligned',
-            'squared',
+            # 'squared',
             'random-01',
             'random-02',
             'random-03',
 
-            'source*',
+            # 'source*',
             'aligned*',
-            'squared*',
+            # 'squared*',
             'random-01*',
             'random-02*',
             'random-03*',
