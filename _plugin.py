@@ -501,14 +501,14 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
             'aligned',
             'squared',
             'random-01',
-            'random-01',
+            'random-02',
             'random-03',
 
             'source*',
             'aligned*',
             'squared*',
             'random-01*',
-            'random-01*',
+            'random-02*',
             'random-03*',
         ]
 
