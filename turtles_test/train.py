@@ -890,9 +890,9 @@ def test(args, epoch, net):
 			predn = pred.cpu().numpy()
 			targn = target.cpu().numpy()
 
-			print(predn)
-			print(targn)
-			print()
+			# print(predn)
+			# print(targn)
+			# print()
 
 			if(all_pred is None):
 				all_pred = predn
@@ -1056,7 +1056,7 @@ def simple_test_show(model,args):
 
 	all_pred = None
 	with torch.no_grad():
-		for data,image in dataloader:
+		for data,image,filename in dataloader:
 			pred = model(data)
 			if(args.separate_trig):
 				pred = separate_trig_to_angle(pred, args)
@@ -1064,7 +1064,13 @@ def simple_test_show(model,args):
 			print(image.shape)
 			I = rotate_im(image.numpy(),-pred)
 			plt.imshow(I)
-			plt.show()
+			plt.axis('off')
+			# plt.show()
+
+			# save file 
+			fname = filename[0][-16:-4].lstrip('0')
+			fname = './results/examples/'+args.animal+'/'+args.animal+fname+'.png'
+			plt.savefig(fname)
 
 
 def adjust_opt(optAlg, optimizer, epoch):

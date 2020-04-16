@@ -70,6 +70,7 @@ class Data_turtles():
 		return len(self.data)
 
 	def __getitem__(self, index):
+		resize_to = 224
 		if(self.args is not None and self.args.filename_test):
 			filename = self.data[index]
 			print(filename)
@@ -80,11 +81,11 @@ class Data_turtles():
 			# plt.show()
 
 			I = transforms.ToPILImage()(image)
-			I = transforms.Resize((128,128))(I)
+			I = transforms.Resize((resize_to,resize_to))(I)
 			I = transforms.ToTensor()(I)
 
 			if(self.args.show):
-				return I/255,image
+				return I/255,image,filename
 			else:
 				return I/255
 		# preprocess all images
@@ -96,7 +97,7 @@ class Data_turtles():
 		# print(poly)
 		# print(theta)
 
-		resize_to = 128
+		
 		angle = get_angle(self.args)
 				
 		theta = theta*180/np.pi

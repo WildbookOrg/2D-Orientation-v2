@@ -216,18 +216,18 @@ Mantaray
 
 
 Rightwhale
-Classification:
-mean: 0.004032258064516129
-standard deviation: 0.10231134767289052
-median: 0.0
-max: 7
-Regression:
-mean: 2.0610304709403744
-standard deviation: 5.3371513793200815
-median: 1.4444890022277832
-max: 48.104244
-class k>5: 0 / 1240
-reg   k>5: 42 / 1240
+    Classification:
+        mean: 0.004032258064516129
+        standard deviation: 0.10231134767289052
+        median: 0.0
+        max: 7
+    Regression:
+        mean: 2.0610304709403744
+        standard deviation: 5.3371513793200815
+        median: 1.4444890022277832
+        max: 48.104244
+    class k>5: 0 / 1240
+    reg   k>5: 42 / 1240
 
 
 12 Class
@@ -285,8 +285,5 @@ reg   k>5: 42 / 1240
         max: 359.85355
     class k>5: 96 / 1240
     reg   k>5: 171 / 1240
-
-
-
 
 
