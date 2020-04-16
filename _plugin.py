@@ -492,9 +492,9 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         >>> ibs = ibeis.opendb(dbdir=dbdir)
         >>> species_list = [
         >>>     'right_whale_head',
-        >>>     'manta_ray_giant',
-        >>>     'seadragon_weedy+head',
         >>>     'turtle_hawksbill+head'
+        >>>     'seadragon_weedy+head',
+        >>>     'manta_ray_giant',
         >>> ]
         >>> for species in species_list:
         >>>     fig_filepath = ibs.ibeis_plugin_orientation_2d_render_feasability(species)
