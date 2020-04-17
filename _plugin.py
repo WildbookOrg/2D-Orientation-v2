@@ -503,7 +503,7 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, model_t
         >>>     ('seadragon_weedy+head',  'seadragon_v2'),
         >>>     ('manta_ray_giant',       'mantaray_v2'),
         >>> ]
-        >>> for desired_species in value_list:
+        >>> for desired_species, model_tag in value_list:
         >>>     fig_filepath = ibs.ibeis_plugin_orientation_2d_render_feasability(
         >>>         desired_species=desired_species,
         >>>         model_tag=model_tag,
