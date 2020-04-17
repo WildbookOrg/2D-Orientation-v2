@@ -382,7 +382,9 @@ def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=T
         >>> import numpy as np
         >>> dbdir = sysres.ensure_testdb_orientation()
         >>> ibs = ibeis.opendb(dbdir=dbdir)
-        >>> fig_filepath = ibs.ibeis_plugin_orientation_2d_render_examples()
+        >>> fig_filepath = ibs.ibeis_plugin_orientation_2d_render_examples(desired_note='source')
+        >>> fig_filepath = ibs.ibeis_plugin_orientation_2d_render_examples(desired_note='aligned')
+        >>> fig_filepath = ibs.ibeis_plugin_orientation_2d_render_examples(desired_note='random-01')
         >>> print(fig_filepath)
     """
     import random
@@ -456,7 +458,8 @@ def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=T
             plt.imshow(canvas)
             index += 1
 
-    fig_filename = 'orientation.2d.examples.predictions.png'
+    args = (desired_note, )
+    fig_filename = 'orientation.2d.examples.predictions.%s.png' % args
     fig_path = abspath(expanduser(join('~', 'Desktop')))
     fig_filepath = join(fig_path, fig_filename)
     plt.savefig(fig_filepath, bbox_inches='tight')
@@ -465,8 +468,9 @@ def ibeis_plugin_orientation_2d_render_examples(ibs, num_examples=10, use_depc=T
 
 
 @register_ibs_method
-def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired_notes=None,
-                                                   use_depc=True, **kwargs):
+def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, model_tag=None,
+                                                   desired_notes=None, use_depc=True,
+                                                   **kwargs):
     r"""
     Show examples of the prediction for each species
 
@@ -489,14 +493,21 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         >>> import numpy as np
         >>> dbdir = sysres.ensure_testdb_orientation()
         >>> ibs = ibeis.opendb(dbdir=dbdir)
-        >>> species_list = [
-        >>>     'right_whale_head',
-        >>>     'turtle_hawksbill+head',
-        >>>     'seadragon_weedy+head',
-        >>>     'manta_ray_giant',
+        >>> value_list = [
+        >>>     ('right_whale_head',      'rightwhale_v1'),
+        >>>     ('turtle_hawksbill+head', 'seaturtle_v1'),
+        >>>     ('seadragon_weedy+head',  'seadragon_v1'),
+        >>>     ('manta_ray_giant',       'mantaray_v1'),
+        >>>     ('right_whale_head',      'rightwhale_v2'),
+        >>>     ('turtle_hawksbill+head', 'seaturtle_v2'),
+        >>>     ('seadragon_weedy+head',  'seadragon_v2'),
+        >>>     ('manta_ray_giant',       'mantaray_v2'),
         >>> ]
-        >>> for species in species_list:
-        >>>     fig_filepath = ibs.ibeis_plugin_orientation_2d_render_feasability(species)
+        >>> for desired_species in value_list:
+        >>>     fig_filepath = ibs.ibeis_plugin_orientation_2d_render_feasability(
+        >>>         desired_species=desired_species,
+        >>>         model_tag=model_tag,
+        >>>     )
         >>>     print(fig_filepath)
     """
     if desired_notes is None:
@@ -515,6 +526,10 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
             'random-02*',
             'random-03*',
         ]
+
+    if model_tag is None:
+        model_tag = SPECIES_MODEL_TAG_MAPPING.get(desired_species, None)
+        assert model_tag is not None
 
     # Load any pre-computed ranks
     rank_dict_filepath = join(ibs.dbdir, 'ranks.%s.pkl' % (desired_species, ))
@@ -546,8 +561,6 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
 
         if desired_note.endswith('*'):
 
-            model_tag = SPECIES_MODEL_TAG_MAPPING.get(desired_species, None)
-            assert model_tag is not None
             config = {
                 'orientation_2d_model_tag': model_tag,
             }
@@ -848,8 +861,8 @@ def ibeis_plugin_orientation_2d_render_feasability(ibs, desired_species, desired
         for val in label_list
     ]
     note_str = '_'.join(label_list_)
-    args = (desired_species, note_str, )
-    fig_filename = 'orientation.2d.matching.hotspotter.%s.%s.png' % args
+    args = (model_tag, desired_species, note_str, )
+    fig_filename = 'orientation.2d.matching.hotspotter.%s.%s.%s.png' % args
     fig_path = abspath(expanduser(join('~', 'Desktop')))
     fig_filepath = join(fig_path, fig_filename)
     plt.savefig(fig_filepath, bbox_inches='tight')
