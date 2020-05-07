@@ -348,7 +348,7 @@ class Data_turtles():
         annIds = self.coco.getAnnIds(imgIds=img['id'], catIds=self.catIds, iscrowd=None)
         try:
             turtle_body, animal_head = self.coco.loadAnns(annIds)
-        except:
+        except Exception:
             # print(self.coco.loadAnns(annIds))
             print(len(self.coco.loadAnns(annIds)))
             print("Error loading image")
@@ -402,7 +402,7 @@ class Data_turtles():
                     animal_head = self.coco.loadAnns(annIds)[0]
                 else:
                     turtle_body, animal_head = self.coco.loadAnns(annIds)
-            except:
+            except Exception:
                 print()
                 print('# anns found:',len(self.coco.loadAnns(annIds)))
                 continue
@@ -415,7 +415,7 @@ class Data_turtles():
             # for filtering out pooly annotated images
             try:
                 self.test_image(I,poly,animal_head['theta'])#,animal_head['viewpoint'])
-            except:
+            except Exception:
                 print("\nskipped",ID)
                 continue
 

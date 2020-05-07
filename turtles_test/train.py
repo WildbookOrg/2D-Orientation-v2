@@ -499,7 +499,7 @@ def main():
     # if hierarchy, this network is the classification network
     try:
         model = torchvision.models.densenet161(pretrained=args.pretrain)
-    except:
+    except Exception:
         print('type this: \n\texport TORCH_HOME=~/.torch')
         exit(1)
     model.classifier = nn.Linear(2208, args.nClasses)

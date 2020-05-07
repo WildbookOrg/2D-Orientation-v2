@@ -46,7 +46,7 @@ def show_images(df, indxs, ncols=5, figsize=(15,10), with_keypoints=True):
 		# if with_keypoints:
 		# 	try:
 		# 		keypoints = df.loc[idx].drop('filename').values.astype(np.float32).reshape(-1, 2)
-		# 	except: 
+		# 	except Exception:
 		# 		print('no filename column to drop')
 		# else:
 		# 	keypoints = []
@@ -111,13 +111,13 @@ class WhaleDataset(Dataset):
 
 class Normalize(object):
 	'''Normalize input images'''
-	
+
 	def __call__(self, sample):
 		image, keypoints = sample['image'], sample['keypoints']
-		
+
 		return {'image': image / 255., # scale to [0, 1]
 				'keypoints': keypoints}
-		
+
 class ToTensor(object):
 	'''Convert ndarrays in sample to Tensors.'''
 
@@ -129,8 +129,8 @@ class ToTensor(object):
 		# torch image: C X H X W
 		# image = image.reshape(1, IMG_SIZE, IMG_SIZE)
 		image = transforms.ToTensor()(image)
-		
-		
+
+
 
 		return {'image': image, 'keypoints': keypoints}
 
@@ -174,21 +174,21 @@ class MLP(nn.Module):
 		# hidden layers
 		layer_sizes = [(input_size, hidden_layers[0])] \
 					  + list(zip(hidden_layers[:-1], hidden_layers[1:]))
-		self.hidden_layers = nn.ModuleList([nn.Linear(h1, h2) 
+		self.hidden_layers = nn.ModuleList([nn.Linear(h1, h2)
 											for h1, h2 in layer_sizes])
 		self.dropout = nn.Dropout(drop_p)
 		self.output = nn.Linear(hidden_layers[-1], output_size)
-		
+
 	def forward(self, x):
 		# flatten inputs
 		x = x.view(x.shape[0], -1)
 		for layer in self.hidden_layers:
 			x = F.relu(layer(x))
 			x = self.dropout(x)
-		x = self.output(x)	
+		x = self.output(x)
 		return x
 
-model = MLP(input_size=IMG_SIZE*IMG_SIZE, output_size=20, 
+model = MLP(input_size=IMG_SIZE*IMG_SIZE, output_size=20,
 			hidden_layers=[128, 64], drop_p=0.1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -197,11 +197,11 @@ model = model.to(device)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.003)
 
-def train(train_loader, valid_loader, model, criterion, optimizer, 
+def train(train_loader, valid_loader, model, criterion, optimizer,
 		  n_epochs=50, saved_model='model.pt'):
 	'''
 	Train the model
-	
+
 	Args:
 		train_loader (DataLoader): DataLoader for train Dataset
 		valid_loader (DataLoader): DataLoader for valid Dataset
@@ -210,7 +210,7 @@ def train(train_loader, valid_loader, model, criterion, optimizer,
 		optimizer (torch.optim): optimization algorithms
 		n_epochs (int): number of epochs to train the model
 		saved_model (str): file path for saving model
-	
+
 	Return:
 		tuple of train_losses, valid_losses
 	'''
@@ -218,7 +218,7 @@ def train(train_loader, valid_loader, model, criterion, optimizer,
 	# initialize tracker for minimum validation loss
 	try:
 		model.load_state_dict(torch.load('model.pt'))
-	except:
+	except Exception:
 		print('failed to load state dict')
 	valid_loss_min = None # set initial "min" to infinity
 
@@ -251,7 +251,7 @@ def train(train_loader, valid_loader, model, criterion, optimizer,
 			# update running training loss
 			train_loss += loss.item()*batch['image'].size(0)
 
-		######################	
+		######################
 		# validate the model #
 		######################
 		model.eval() # prep model for evaluation
@@ -260,10 +260,10 @@ def train(train_loader, valid_loader, model, criterion, optimizer,
 			output = model(batch['image'].to(device))
 			# calculate the loss
 			loss = criterion(output, batch['keypoints'].to(device))
-			# update running validation loss 
+			# update running validation loss
 			valid_loss += loss.item()*batch['image'].size(0)
 
-		# print training/validation statistics 
+		# print training/validation statistics
 		# calculate average Root Mean Square loss over an epoch
 		train_loss = np.sqrt(train_loss/len(train_loader.dataset))
 		valid_loss = np.sqrt(valid_loss/len(valid_loader.dataset))
@@ -280,11 +280,11 @@ def train(train_loader, valid_loader, model, criterion, optimizer,
 				  .format(valid_loss_min, valid_loss))
 			torch.save(model.state_dict(), saved_model)
 			valid_loss_min = valid_loss
-			
+
 	return train_losses, valid_losses
 
 train_losses, valid_losses = train(train_loader, val_loader, model,
-								   criterion, optimizer, n_epochs=0, 
+								   criterion, optimizer, n_epochs=0,
 								   saved_model='model.pt')
 
 def plot_RMSE(train_losses, valid_losses, y_max=50):
@@ -308,7 +308,7 @@ def predict(data_loader, model):
 	Return:
 		predictions (array-like): keypoints in float (no. of images x keypoints).
 	'''
-	
+
 	model.eval() # prep model for evaluation
 	with torch.no_grad():
 		for i, batch in enumerate(data_loader):

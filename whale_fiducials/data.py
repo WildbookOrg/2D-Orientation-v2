@@ -1,4 +1,4 @@
-# regular imports 
+# regular imports
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -13,7 +13,7 @@ import torchvision.transforms.functional as F
 # custom imports
 
 
-# custom transforms 
+# custom transforms
 class HorizontalFlip(object):
 
 	def __init__(self, randint):
@@ -45,7 +45,7 @@ class Perspective(object):
 		Returns:
 			PIL Image: Random perspectivley transformed image.
 		"""
-		
+
 		if self.randint < self.p:
 			width, height = img.size
 			startpoints, endpoints = self.get_params(width, height, self.distortion_scale)
@@ -73,7 +73,7 @@ class Perspective(object):
 				   np.random.uniform(height - int(distortion_scale * half_height) - 1, height - 1))
 		startpoints = [(0, 0), (width - 1, 0), (width - 1, height - 1), (0, height - 1)]
 		endpoints = [topleft, topright, botright, botleft]
-		
+
 		self.startpoints = startpoints
 		self.endpoints = endpoints
 
@@ -105,7 +105,7 @@ class Perspective(object):
 		B = torch.tensor(startpoints, dtype=torch.float).view(8)
 		res = torch.gels(B, A)[0]
 		coeffs = res.squeeze_(1).tolist()
-		
+
 		return img.transform(img.size, Image.PERSPECTIVE, coeffs, interpolation)
 
 class RandomCrop(object):
@@ -190,28 +190,28 @@ class Data():
 			keypoints = self.testing_keypoints[index].astype(float)
 
 		show = False
-		
+
 		if(self.args.nClasses == 4):
 			# just the x,y of the two tips
 			keypoints = keypoints[[0,1,8,9]]
 		else:
 			keypoints = keypoints[:self.args.nClasses]
-			
+
 		if(self.args.augment and self.type.startswith('train')):
 			image_normalized, augmented_keypoints = self.augment_image_train(im, keypoints)
 		else:
 			image_normalized, original, augmented_keypoints = self.augment_image_test(im, keypoints)
 			I = np.array(original)
-		
 
-		
+
+
 
 		if(show):
 			self.show_keypoints(I, augmented_keypoints)
 
 		if(self.args.example):
 			return image_normalized, I, augmented_keypoints
-		
+
 		return image_normalized, augmented_keypoints
 
 	def augment_image_train(self, image, keypoints):
@@ -220,8 +220,8 @@ class Data():
 		hflip_randint = np.random.uniform()
 
 		# force perspective transform for everything
-		persp_randint = 0. # np.random.uniform() 
-	
+		persp_randint = 0. # np.random.uniform()
+
 
 		pt = Perspective(persp_randint)
 
@@ -248,7 +248,7 @@ class Data():
 		plt.imshow(image)
 		plt.show()
 
-		
+
 		keypoints[list(range(0,self.args.nClasses,2))] = keypoints[list(range(0,self.args.nClasses,2))]*self.args.resize_to/w
 		keypoints[list(range(1,self.args.nClasses,2))] = keypoints[list(range(1,self.args.nClasses,2))]*self.args.resize_to/h
 
@@ -268,7 +268,7 @@ class Data():
 		h,w = image.shape[:2]
 		I = transforms.ToPILImage()(image)
 		I = transforms.Resize((self.args.resize_to,self.args.resize_to))(I)
-		image_normalized = transforms.ToTensor()(I)/255.0	
+		image_normalized = transforms.ToTensor()(I)/255.0
 		keypoints[list(range(0,self.args.nClasses,2))] = keypoints[list(range(0,self.args.nClasses,2))]*self.args.resize_to/w
 		keypoints[list(range(1,self.args.nClasses,2))] = keypoints[list(range(1,self.args.nClasses,2))]*self.args.resize_to/h
 		return image_normalized, I, keypoints
@@ -291,7 +291,7 @@ class Data():
 		# pull from corresponding dataset
 		if(self.type.startswith('train')):
 			filenames = self.training_filenames
-		if(self.type.startswith('val')):		
+		if(self.type.startswith('val')):
 			filenames = self.validation_filenames
 		if(self.type.startswith('test')):
 			filenames = self.testing_filenames
@@ -311,7 +311,7 @@ class Data():
 
 
 	def show_keypoints(self, image, keypoints, show_keypoints=True):
-		
+
 
 		plt.imshow(image)
 		if(show_keypoints):
@@ -336,7 +336,7 @@ class Data():
 				if(k==99): # c
 					print('index:',index)
 					progress_file.write(str(index)+'\n')
-			except:
+			except Exception:
 				progress_file.write('Failed at %s,%s\n'%(str(index),self.filenames[index]))
 				print(self.training_keypoints[index])
 
@@ -352,5 +352,5 @@ class Data():
 					break
 				if(k==99): # c
 					print('Filename:',self.bad_filenames[index])
-			except:
+			except Exception:
 				print('Failed at',self.bad_filenames[index])

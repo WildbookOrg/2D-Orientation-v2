@@ -22,14 +22,14 @@ def network_preprocessing(model, args):
 	# choice to not resume
 	if(args.no_resume):
 		# change later when it matters
-		
+
 		# file exists -> confirm, delete, train from scratch
 		if(os.path.exists(args.save_path)):
 			shutil.rmtree(args.save_path)
 			# =============================
 			# i = input('Deleting save path.. continue (y/n) ')
 			# if(i == 'y'):
-			# 	shutil.rmtree(save_path) 
+			# 	shutil.rmtree(save_path)
 			# 	print('\t...Old state dict and stats files deleted')
 			# else:
 			# 	print('Cancelling program')
@@ -49,7 +49,7 @@ def network_preprocessing(model, args):
 		else:
 			print('No state dict file found... (use --no-resume to begin training from scratch)')
 			exit(1)
-	
+
 	# if no file, the choice was to train from scratch
 	if(not os.path.exists(args.save_path)):
 		print('\t...Creating new working directory and empty files')
@@ -105,18 +105,18 @@ if __name__ == '__main__':
 	args.save_file = '{}.{}.latest.pth'.format(args.type, args.nClasses)
 	args.pth_file = os.path.join(args.save_path,args.save_file)
 
-	
+
 	# create model instance, add ending classifier
 	try:
 		model = torchvision.models.densenet161(pretrained=args.pretrain)
 		model.classifier = nn.Linear(2208, args.nClasses)
-	except:
+	except Exception:
 		print('*model creation failed*')
 		print('type this:\n\texport TORCH_HOME=~/.torch')
 		exit(1)
 	if(args.type.startswith('classification')):
 		model.classifier = nn.Sequential(
-			nn.Linear(2208, args.nClasses), 
+			nn.Linear(2208, args.nClasses),
 			nn.LogSoftmax(dim=0)
 		)
 	model = network_preprocessing(model, args)
@@ -181,7 +181,7 @@ if __name__ == '__main__':
 		'val' : [[],[]],
 		'save' : [[],[]]
 	}
-	
+
 	# then train
 	# best value loss calculated from the previous training session weights
 	best_val_loss = train2(args, 0, model, dataloaders['val'], datafiles['val'], loss_func, 'val')
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 			loss_history['save'][1].append(epoch)
 			torch.save(model.state_dict(), args.pth_file)
 			print()
-		
+
 	# close data files
 	for key in datafiles.keys():
 		datafiles[key].close()
@@ -214,5 +214,3 @@ if __name__ == '__main__':
 	for i,key in enumerate(loss_history.keys()):
 		plt.plot(loss_history[key][0],loss_history[key][1],c=c[i])
 	plt.show()
-
-	

@@ -1,7 +1,7 @@
-import numpy as np	
+import numpy as np
 
 def ensure_classification4_prediction_correct():
-	
+
 
 	n = 4
 	for i in range(10000):
@@ -11,5 +11,5 @@ def ensure_classification4_prediction_correct():
 			z = 0 if x<90 else 1 if x<180 else 2 if x<270 else 3
 			try:
 				assert(y == z)
-			except:
+			except Exception:
 				print(x,z)
