@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # regular imports
 import os
 import argparse

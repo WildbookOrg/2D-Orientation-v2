@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'tsungyi'
 
 from ._mask import _mask
