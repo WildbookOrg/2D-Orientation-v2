@@ -91,7 +91,7 @@ def arg_check(args):
 		elif(args.type.startswith('regression')):
 			args.nClasses = 1
 		else:
-			print("Invalid class number provided, see -h for help")
+			print('Invalid class number provided, see -h for help')
 			exit(1)
 
 	if(not args.hierarchy and args.separate_trig and args.type=='regression'):
@@ -493,7 +493,7 @@ def main():
 				val_loss,val_loss_reg = train_hierarchy(args, epoch, [model,model_reg], dataloaders[phase], [optimizer,optimizer_reg], datafiles[phase], [loss_func,loss_func_reg], phase)
 				
 			if(val_loss<best_val_loss):
-				print("Saving Class State Dict: new loss is",val_loss)
+				print('Saving Class State Dict: new loss is',val_loss)
 				best_val_loss = val_loss
 				torch.save(model.state_dict(), args.pth_file)
 			else:
@@ -501,7 +501,7 @@ def main():
 				print()
 
 			if(val_loss_reg<best_val_loss_reg):
-				print("Saving Reg State Dict: new loss is",val_loss_reg)
+				print('Saving Reg State Dict: new loss is',val_loss_reg)
 				best_val_loss_reg = val_loss_reg
 				torch.save(model_reg.state_dict(), args.pth_file_reg)
 			else:
@@ -519,7 +519,7 @@ def main():
 				val_loss = train(args, epoch, model, dataloaders[phase], optimizer, datafiles[phase], loss_func, phase)
 				
 			if(val_loss<best_val_loss):
-				print("Saving State Dict: new loss is",val_loss)
+				print('Saving State Dict: new loss is',val_loss)
 				best_val_loss = val_loss
 				torch.save(model.state_dict(), args.pth_file)
 			else:

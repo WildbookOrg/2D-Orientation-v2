@@ -6,7 +6,7 @@ import sys
 import os
 from data_aug.bbox_util import *
 
-lib_path = os.path.join(os.path.realpath("."), "data_aug")
+lib_path = os.path.join(os.path.realpath('.'), 'data_aug')
 sys.path.append(lib_path)
 
 
@@ -123,11 +123,11 @@ class RandomScale(object):
 
 		
 		if type(self.scale) == tuple:
-			assert len(self.scale) == 2, "Invalid range"
+			assert len(self.scale) == 2, 'Invalid range'
 			assert self.scale[0] > -1, "Scale factor can't be less than -1"
 			assert self.scale[1] > -1, "Scale factor can't be less than -1"
 		else:
-			assert self.scale > 0, "Please input a positive float"
+			assert self.scale > 0, 'Please input a positive float'
 			self.scale = (max(-1, -self.scale), self.scale)
 		
 		self.diff = diff
@@ -271,7 +271,7 @@ class RandomTranslate(object):
 		self.translate = translate
 		
 		if type(self.translate) == tuple:
-			assert len(self.translate) == 2, "Invalid range"  
+			assert len(self.translate) == 2, 'Invalid range'  
 			assert self.translate[0] > 0 & self.translate[0] < 1
 			assert self.translate[1] > 0 & self.translate[1] < 1
 
@@ -436,7 +436,7 @@ class RandomRotate(object):
 		self.angle = angle
 		
 		if type(self.angle) == tuple:
-			assert len(self.angle) == 2, "Invalid range"  
+			assert len(self.angle) == 2, 'Invalid range'  
 			
 		else:
 			self.angle = (-self.angle, self.angle)
@@ -585,7 +585,7 @@ class RandomShear(object):
 		self.shear_factor = shear_factor
 		
 		if type(self.shear_factor) == tuple:
-			assert len(self.shear_factor) == 2, "Invalid range for scaling factor"   
+			assert len(self.shear_factor) == 2, 'Invalid range for scaling factor'   
 		else:
 			self.shear_factor = (-self.shear_factor, self.shear_factor)
 		

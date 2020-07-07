@@ -57,7 +57,7 @@ def network_preprocessing(model, args):
 		os.makedirs(args.save_path, exist_ok=True)
 
 	if(args.nClasses % 2 != 0):
-		print("nClasses must be even")
+		print('nClasses must be even')
 		exit(1)
 
 	# enable cuda
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 	# args.type = 'regression_fluke_tips'
 	args.opt = 'adam'
 	args.cuda = torch.cuda.is_available()
-	args.device = torch.device("cuda:{}".format(int(args.device)) if args.cuda else "cpu")
+	args.device = torch.device('cuda:{}'.format(int(args.device)) if args.cuda else 'cpu')
 
 	args.save_path = 'work/densenet.%s.%s/'%(args.type,args.nClasses)
 	args.save_file = '{}.{}.latest.pth'.format(args.type, args.nClasses)
@@ -198,7 +198,7 @@ if __name__ == '__main__':
 			print()
 
 		if(val_loss<best_val_loss):
-			print("Saving State Dict: new best loss is",val_loss)
+			print('Saving State Dict: new best loss is',val_loss)
 			best_val_loss = val_loss
 			loss_history['save'][0].append(val_loss)
 			loss_history['save'][1].append(epoch)

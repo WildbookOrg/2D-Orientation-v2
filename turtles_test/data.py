@@ -52,7 +52,7 @@ class Data_turtles():
 		self.imgIds = self.coco.getImgIds(catIds=self.catIds);
 		self.args = args
 		self.experiment_type = experiment_type
-		print("Loading Data: {}".format(dataType))
+		print('Loading Data: {}'.format(dataType))
 		self.preprocess_images()
 
 		# need to shuffle if using pickle to load
@@ -272,7 +272,7 @@ class Data_turtles():
 		except:
 			# print(self.coco.loadAnns(annIds))
 			print(len(self.coco.loadAnns(annIds)))
-			print("Error loading image")
+			print('Error loading image')
 			exit(1)
 
 		return (I,animal_head['segmentation'],animal_head['theta'])
@@ -287,15 +287,15 @@ class Data_turtles():
 		# 	return 
 
 		# when loading whole dataset
-		if(os.path.isfile(self.dataDir+"/loaded_data_{}.p".format(self.dataType))):
-			print("Pickle file found, loading data...")
-			(self.data, self.means,self.stds) = pickle.load(open(self.dataDir+"/loaded_data_{}.p".format(self.dataType), "rb" ))
+		if(os.path.isfile(self.dataDir+'/loaded_data_{}.p'.format(self.dataType))):
+			print('Pickle file found, loading data...')
+			(self.data, self.means,self.stds) = pickle.load(open(self.dataDir+'/loaded_data_{}.p'.format(self.dataType), 'rb' ))
 			print(self.dataType,len(self.data))
 			return 
 
 
 
-		bar = Bar("Preprocessing",max=len(self.imgIds))
+		bar = Bar('Preprocessing',max=len(self.imgIds))
 		self.data = []
 
 		N = len(self.imgIds)
@@ -337,7 +337,7 @@ class Data_turtles():
 			try:
 				self.test_image(I,poly,animal_head['theta'])#,animal_head['viewpoint'])
 			except:
-				print("\nskipped",ID)
+				print('\nskipped',ID)
 				continue
 
 			# h,w = I.shape[:2]
@@ -354,9 +354,9 @@ class Data_turtles():
 		self.means = means
 		self.stds = stds
 
-		print("Saving binary file...")
+		print('Saving binary file...')
 		# have the option of loading whole dataset or just means and stdevs
-		pickle.dump((self.data,means,stds), open(self.dataDir+"/loaded_data_{}.p".format(self.dataType), "wb" ))
+		pickle.dump((self.data,means,stds), open(self.dataDir+'/loaded_data_{}.p'.format(self.dataType), 'wb' ))
 		# pickle.dump((means,stds), open(self.dataDir+"/loaded_data_{}_means_stds.p".format(self.dataType), "wb" ))
 
 

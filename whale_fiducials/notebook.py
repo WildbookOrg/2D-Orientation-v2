@@ -288,8 +288,8 @@ train_losses, valid_losses = train(train_loader, val_loader, model,
 								   saved_model='model.pt')
 
 def plot_RMSE(train_losses, valid_losses, y_max=50):
-	plt.plot(train_losses, "--", linewidth=3, label="train")
-	plt.plot(valid_losses, linewidth=3, label="val")
+	plt.plot(train_losses, '--', linewidth=3, label='train')
+	plt.plot(valid_losses, linewidth=3, label='val')
 	plt.legend()
 	plt.grid()
 	plt.xlabel('Epoch')

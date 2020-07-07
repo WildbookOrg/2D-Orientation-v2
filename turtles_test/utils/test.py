@@ -31,8 +31,8 @@ def plot_confusion_matrix(y_pred, y_true, classes,
 			xlabel='Predicted label')
 
 	# Rotate the tick labels and set their alignment.
-	plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
-			 rotation_mode="anchor")
+	plt.setp(ax.get_xticklabels(), rotation=45, ha='right',
+			 rotation_mode='anchor')
 
 	# print quantity in each block, only for few classes bc gets cluttered
 	if(len(classes)<10):
@@ -41,8 +41,8 @@ def plot_confusion_matrix(y_pred, y_true, classes,
 		for i in range(cm.shape[0]):
 			for j in range(cm.shape[1]):
 				ax.text(j, i, format(cm[i, j], fmt),
-						ha="center", va="center",
-						color="white" if cm[i, j] > thresh else "black")
+						ha='center', va='center',
+						color='white' if cm[i, j] > thresh else 'black')
 	fig.tight_layout()
 	return ax
 
@@ -50,23 +50,23 @@ def plot_confusion_matrix(y_pred, y_true, classes,
 def test_stats(args, all_pred, all_targ, all_diff):
 	# ===============================================
 	# print basic statistics
-	print("For 360 degrees:")
-	print("mean:",np.mean(all_diff))
-	print("standard deviation:",np.std(all_diff))
-	print("median:",np.median(all_diff))
+	print('For 360 degrees:')
+	print('mean:',np.mean(all_diff))
+	print('standard deviation:',np.std(all_diff))
+	print('median:',np.median(all_diff))
 
 	# ===============================================
 	# plot confusion matrix plot
 	
-	print("max:",max(all_pred))
+	print('max:',max(all_pred))
 	classes = np.arange(0,max(all_pred)+1)
 	trig = 'Trig Component ' if args.separate_trig and args.type=='regression' else ''
 	if(args.type=='classification' and not args.hierarchy):
 		trig = str(args.nClasses)+' '
 	plot_confusion_matrix(all_pred.astype(np.int32), all_targ.astype(np.int32), classes)
-	plt.title(("{} {}Error - ".format(args.type.title(),trig)+str(args.animal).title()))
-	plt.xlabel("True Label")
-	plt.ylabel("Predicted Label")
+	plt.title(('{} {}Error - '.format(args.type.title(),trig)+str(args.animal).title()))
+	plt.xlabel('True Label')
+	plt.ylabel('Predicted Label')
 	plt.show()
 
 	# ===============================================

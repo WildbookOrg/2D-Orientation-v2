@@ -223,7 +223,7 @@ def test(args, model, dataloader, datafile, loss_func, phase):
 	plt.hist(x2, label='Right Tip X', alpha=0.4, bins = np.linspace(np.min(x2),np.max(x2),num=50))
 	plt.hist(y1, label='Left Tip Y', alpha=0.4, bins = np.linspace(np.min(x2),np.max(x2),num=50))
 	plt.hist(y2, label='Right Tip Y', alpha=0.4, bins = np.linspace(np.min(x2),np.max(x2),num=50))
-	plt.title("Error Histograms of Tip Coordinates")
+	plt.title('Error Histograms of Tip Coordinates')
 	plt.xlabel('Difference between Predicted and True locations')
 	plt.ylabel('Frequency in Test Set')
 	plt.legend()

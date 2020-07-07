@@ -7,9 +7,9 @@ from .DenseNet import DenseNet
 from .Data import Data
 
 def example(args):
-	print("Showing Example of Weights")
+	print('Showing Example of Weights')
 	if(not os.path.exists(args.save)):
-		print("Save path does not exist")
+		print('Save path does not exist')
 		exit(1)
 	net = DenseNet(growthRate=12, depth=100, reduction=0.5,
 						bottleneck=True, nClasses=args.nClasses)
