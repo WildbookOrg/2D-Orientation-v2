@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def train(args, epoch, net, trainLoader, optimizer, trainF):
 	net.train()
 	nProcessed = 0

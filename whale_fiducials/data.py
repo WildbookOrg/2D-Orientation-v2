@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # regular imports 
 import numpy as np
 import cv2
