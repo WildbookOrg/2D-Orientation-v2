@@ -19,6 +19,7 @@ from collections import deque
 from datetime import timedelta
 from math import ceil
 from sys import stderr
+
 try:
     from time import monotonic
 except ImportError:
@@ -33,7 +34,7 @@ SHOW_CURSOR = '\x1b[?25h'
 
 class Infinite(object):
     file = stderr
-    sma_window = 10         # Simple Moving Average window
+    sma_window = 10  # Simple Moving Average window
     check_tty = True
     hide_cursor = True
 
@@ -75,8 +76,7 @@ class Infinite(object):
             self._xput.append(dt / n)
             now = monotonic()
             # update when we're still filling _xput, then after every second
-            if (xput_len < self.sma_window or
-                    now - self._avg_update_ts > 1):
+            if xput_len < self.sma_window or now - self._avg_update_ts > 1:
                 self.avg = sum(self._xput) / len(self._xput)
                 self._avg_update_ts = now
 

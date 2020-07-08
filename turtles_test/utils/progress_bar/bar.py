@@ -37,8 +37,7 @@ class Bar(Progress):
         bar = self.fill * filled_length
         empty = self.empty_fill * empty_length
         suffix = self.suffix % self
-        line = ''.join([message, self.bar_prefix, bar, empty, self.bar_suffix,
-                        suffix])
+        line = ''.join([message, self.bar_prefix, bar, empty, self.bar_suffix, suffix])
         self.writeln(line)
 
 
@@ -62,24 +61,25 @@ class FillingCirclesBar(ChargingBar):
 
 class IncrementalBar(Bar):
     if sys.platform.startswith('win'):
-        phases = (u' ', u'▌', u'█')
+        phases = (' ', '▌', '█')
     else:
         phases = (' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█')
 
     def update(self):
         nphases = len(self.phases)
         filled_len = self.width * self.progress
-        nfull = int(filled_len)                      # Number of full chars
+        nfull = int(filled_len)  # Number of full chars
         phase = int((filled_len - nfull) * nphases)  # Phase of last char
-        nempty = self.width - nfull                  # Number of empty chars
+        nempty = self.width - nfull  # Number of empty chars
 
         message = self.message % self
         bar = self.phases[-1] * nfull
         current = self.phases[phase] if phase > 0 else ''
         empty = self.empty_fill * max(0, nempty - len(current))
         suffix = self.suffix % self
-        line = ''.join([message, self.bar_prefix, bar, current, empty,
-                        self.bar_suffix, suffix])
+        line = ''.join(
+            [message, self.bar_prefix, bar, current, empty, self.bar_suffix, suffix]
+        )
         self.writeln(line)
 
 

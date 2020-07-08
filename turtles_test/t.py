@@ -25,18 +25,18 @@ import numpy as np
 
 x = 1
 y = 1
-y = np.arctan2(y,x)
-plt.plot(x,y)
+y = np.arctan2(y, x)
+plt.plot(x, y)
 
 x = 2
 y = 1
-y = np.arctan2(y,x)
-plt.plot(x,y)
+y = np.arctan2(y, x)
+plt.plot(x, y)
 
 x = 1
 y = 2
-y = np.arctan2(y,x)
-plt.plot(x,y)
+y = np.arctan2(y, x)
+plt.plot(x, y)
 
 
 plt.title('Arctan2 Curve')
