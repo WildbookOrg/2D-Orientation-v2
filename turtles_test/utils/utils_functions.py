@@ -6,8 +6,10 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def to_categorical(y, num_classes):
-    return np.eye(num_classes,dtype='uint8')[y]
+    return np.eye(num_classes, dtype='uint8')[y]
+
 
 def angle_difference(x, y):
     """
@@ -23,7 +25,7 @@ def angle_error(y_true, y_pred):
     as a binary vector.
     """
     diff = angle_difference(np.argmax(y_true), np.argmax(y_pred))
-    return np.mean(np.abs(diff),dtype=np.float32)
+    return np.mean(np.abs(diff), dtype=np.float32)
 
 
 def angle_error_regression(y_true, y_pred):
@@ -60,9 +62,7 @@ def rotate(image, angle):
     image_center = tuple(np.array(image_size) / 2)
 
     # Convert the OpenCV 3x2 rotation matrix to 3x3
-    rot_mat = np.vstack(
-        [cv2.getRotationMatrix2D(image_center, angle, 1.0), [0, 0, 1]]
-    )
+    rot_mat = np.vstack([cv2.getRotationMatrix2D(image_center, angle, 1.0), [0, 0, 1]])
 
     rot_mat_notranslate = np.matrix(rot_mat[0:2, 0:2])
 
@@ -72,10 +72,10 @@ def rotate(image, angle):
 
     # Obtain the rotated coordinates of the image corners
     rotated_coords = [
-        (np.array([-image_w2,  image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([ image_w2,  image_h2]) * rot_mat_notranslate).A[0],
+        (np.array([-image_w2, image_h2]) * rot_mat_notranslate).A[0],
+        (np.array([image_w2, image_h2]) * rot_mat_notranslate).A[0],
         (np.array([-image_w2, -image_h2]) * rot_mat_notranslate).A[0],
-        (np.array([ image_w2, -image_h2]) * rot_mat_notranslate).A[0]
+        (np.array([image_w2, -image_h2]) * rot_mat_notranslate).A[0],
     ]
 
     # Find the size of the new image
@@ -96,22 +96,19 @@ def rotate(image, angle):
     new_h = int(abs(top_bound - bot_bound))
 
     # We require a translation matrix to keep the image centred
-    trans_mat = np.matrix([
-        [1, 0, int(new_w * 0.5 - image_w2)],
-        [0, 1, int(new_h * 0.5 - image_h2)],
-        [0, 0, 1]
-    ])
+    trans_mat = np.matrix(
+        [
+            [1, 0, int(new_w * 0.5 - image_w2)],
+            [0, 1, int(new_h * 0.5 - image_h2)],
+            [0, 0, 1],
+        ]
+    )
 
     # Compute the tranform for the combined rotation and translation
     affine_mat = (np.matrix(trans_mat) * np.matrix(rot_mat))[0:2, :]
 
     # Apply the transform
-    result = cv2.warpAffine(
-        image,
-        affine_mat,
-        (new_w, new_h),
-        flags=cv2.INTER_LINEAR
-    )
+    result = cv2.warpAffine(image, affine_mat, (new_w, new_h), flags=cv2.INTER_LINEAR)
 
     return result
 
@@ -148,10 +145,7 @@ def largest_rotated_rect(w, h, angle):
     y = a * math.cos(gamma)
     x = y * math.tan(gamma)
 
-    return (
-        bb_w - 2 * x,
-        bb_h - 2 * y
-    )
+    return (bb_w - 2 * x, bb_h - 2 * y)
 
 
 def crop_around_center(image, width, height):
@@ -165,10 +159,10 @@ def crop_around_center(image, width, height):
     image_size = (image.shape[1], image.shape[0])
     image_center = (int(image_size[0] * 0.5), int(image_size[1] * 0.5))
 
-    if(width > image_size[0]):
+    if width > image_size[0]:
         width = image_size[0]
 
-    if(height > image_size[1]):
+    if height > image_size[1]:
         height = image_size[1]
 
     x1 = int(image_center[0] - width * 0.5)
@@ -185,17 +179,13 @@ def crop_largest_rectangle(image, angle, height, width):
     found with largest_rotated_rect.
     """
     return crop_around_center(
-        image,
-        *largest_rotated_rect(
-            width,
-            height,
-            math.radians(angle)
-        )
+        image, *largest_rotated_rect(width, height, math.radians(angle))
     )
 
 
-def generate_rotated_image(image, angle, size=None, crop_center=False,
-                           crop_largest_rect=False):
+def generate_rotated_image(
+    image, angle, size=None, crop_center=False, crop_largest_rect=False
+):
     """
     Generate a valid rotated image for the RotNetDataGenerator. If the
     image is rectangular, the crop_center option should be used to make
@@ -227,9 +217,20 @@ class RotNetDataGenerator(Iterator):
     generate batches of rotated images and rotation angles on-the-fly.
     """
 
-    def __init__(self, input, input_shape=None, color_mode='rgb', batch_size=64,
-                 one_hot=True, preprocess_func=None, rotate=True, crop_center=False,
-                 crop_largest_rect=False, shuffle=False, seed=None):
+    def __init__(
+        self,
+        input,
+        input_shape=None,
+        color_mode='rgb',
+        batch_size=64,
+        one_hot=True,
+        preprocess_func=None,
+        rotate=True,
+        crop_center=False,
+        crop_largest_rect=False,
+        shuffle=False,
+        seed=None,
+    ):
 
         self.images = None
         self.filenames = None
@@ -244,8 +245,9 @@ class RotNetDataGenerator(Iterator):
         self.shuffle = shuffle
 
         if self.color_mode not in {'rgb', 'grayscale'}:
-            raise ValueError('Invalid color mode:', self.color_mode,
-                             '; expected "rgb" or "grayscale".')
+            raise ValueError(
+                'Invalid color mode:', self.color_mode, '; expected "rgb" or "grayscale".'
+            )
 
         # check whether the input is a NumPy array or a list of paths
         if isinstance(input, (np.ndarray)):
@@ -290,7 +292,7 @@ class RotNetDataGenerator(Iterator):
                 rotation_angle,
                 size=self.input_shape[:2],
                 crop_center=self.crop_center,
-                crop_largest_rect=self.crop_largest_rect
+                crop_largest_rect=self.crop_largest_rect,
             )
 
             # add dimension to account for the channels if the image is greyscale
@@ -321,8 +323,16 @@ class RotNetDataGenerator(Iterator):
         return self._get_batches_of_transformed_samples(index_array)
 
 
-def display_examples(model, input, num_images=5, size=None, crop_center=False,
-                     crop_largest_rect=False, preprocess_func=None, save_path=None):
+def display_examples(
+    model,
+    input,
+    num_images=5,
+    size=None,
+    crop_center=False,
+    crop_largest_rect=False,
+    preprocess_func=None,
+    save_path=None,
+):
     """
     Given a model that predicts the rotation angle of an image,
     and a NumPy array of images or a list of image paths, display
@@ -357,7 +367,7 @@ def display_examples(model, input, num_images=5, size=None, crop_center=False,
             rotation_angle,
             size=size,
             crop_center=crop_center,
-            crop_largest_rect=crop_largest_rect
+            crop_largest_rect=crop_largest_rect,
         )
         x.append(rotated_image)
         y.append(rotation_angle)
@@ -380,10 +390,7 @@ def display_examples(model, input, num_images=5, size=None, crop_center=False,
 
     plt.figure(figsize=(10.0, 2 * num_images))
 
-    title_fontdict = {
-        'fontsize': 14,
-        'fontweight': 'bold'
-    }
+    title_fontdict = {'fontsize': 14, 'fontweight': 'bold'}
 
     fig_number = 0
     for rotated_image, true_angle, predicted_angle in zip(x_rot, y, y_pred):
@@ -393,7 +400,9 @@ def display_examples(model, input, num_images=5, size=None, crop_center=False,
 
         corrected_image = rotate(rotated_image, -predicted_angle)
         if crop_largest_rect:
-            corrected_image = crop_largest_rectangle(corrected_image, -predicted_angle, *size)
+            corrected_image = crop_largest_rectangle(
+                corrected_image, -predicted_angle, *size
+            )
 
         if x.shape[3] == 1:
             options = {'cmap': 'gray'}
@@ -412,10 +421,12 @@ def display_examples(model, input, num_images=5, size=None, crop_center=False,
         if fig_number == 2:
             plt.title('Rotated\n', fontdict=title_fontdict)
         ax.text(
-            0.5, 1.03, 'Angle: {0}'.format(true_angle),
+            0.5,
+            1.03,
+            'Angle: {0}'.format(true_angle),
             horizontalalignment='center',
             transform=ax.transAxes,
-            fontsize=11
+            fontsize=11,
         )
         plt.imshow(np.squeeze(rotated_image).astype('uint8'), **options)
         plt.axis('off')
@@ -426,10 +437,12 @@ def display_examples(model, input, num_images=5, size=None, crop_center=False,
         if fig_number == 3:
             plt.title('Corrected\n', fontdict=title_fontdict)
         ax.text(
-            0.5, 1.03, 'Angle: {0}'.format(corrected_angle),
+            0.5,
+            1.03,
+            'Angle: {0}'.format(corrected_angle),
             horizontalalignment='center',
             transform=ax.transAxes,
-            fontsize=11
+            fontsize=11,
         )
         plt.imshow(np.squeeze(corrected_image).astype('uint8'), **options)
         plt.axis('off')
